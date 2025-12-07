@@ -21,6 +21,8 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Form, Field } from 'src/components/hook-form';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
+import { SimplePdfView } from 'src/sections/pdf/view/simple-pdf-view';
+
 // ----------------------------------------------------------------------
 
 const PublicationCreateSchema = zod.object({
@@ -251,48 +253,26 @@ export function PublicationCreateView() {
           <Box sx={{ flex: 1, overflow: 'auto' }}>
             {fileIsLoaded.value ? (
               <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                  <Box sx={{ typography: 'h6' }}>Selected File</Box>
-                  <Box sx={{ typography: 'body2', color: 'text.secondary' }}>
-                    {selectedFile?.name} ({(selectedFile?.size / 1024 / 1024).toFixed(2)} MB)
+                <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Box sx={{ typography: 'h6' }}>Selected File</Box>
+                    <Box sx={{ typography: 'body2', color: 'text.secondary' }}>
+                      {selectedFile?.name} ({(selectedFile?.size / 1024 / 1024).toFixed(2)} MB)
+                    </Box>
                   </Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      fileIsLoaded.onFalse();
+                    }}
+                  >
+                    Change File
+                  </Button>
                 </Box>
-                <Box sx={{ flex: 1, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Box sx={{ width: 64, height: 64, mb: 2, mx: 'auto' }}>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="64"
-                        height="64"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <line x1="16" y1="13" x2="8" y2="13" />
-                        <line x1="16" y1="17" x2="8" y2="17" />
-                        <polyline points="10 9 9 9 8 9" />
-                      </svg>
-                    </Box>
-                    <Box sx={{ typography: 'h6' }}>PDF Ready for Upload</Box>
-                    <Box sx={{ typography: 'body2', color: 'text.secondary', mt: 1 }}>
-                      {selectedFile?.name}
-                    </Box>
-                    <Button
-                      variant="outlined"
-                      sx={{ mt: 2 }}
-                      onClick={() => {
-                        setSelectedFile(null);
-                        fileIsLoaded.onFalse();
-                      }}
-                    >
-                      Change File
-                    </Button>
-                  </Box>
+                <Box sx={{ flex: 1, overflow: 'auto' }}>
+                  <SimplePdfView pdfFile={selectedFile} />
                 </Box>
               </Box>
             ) : (
