@@ -59,6 +59,34 @@ export const navData = [
     ],
   },
   /**
+   * Publications Management
+   */
+  {
+    subheader: 'Publications',
+    items: [
+      {
+        title: 'Upload Paper',
+        path: paths.dashboard.publications.create,
+        icon: ICONS.file,
+      },
+      {
+        title: 'Browse Papers',
+        path: paths.dashboard.publications.list,
+        icon: ICONS.folder,
+      },
+      {
+        title: 'Authors',
+        path: paths.dashboard.authors.list,
+        icon: ICONS.user,
+      },
+      {
+        title: 'Citations',
+        path: paths.dashboard.citations.list,
+        icon: ICONS.label,
+      },
+    ],
+  },
+  /**
    * Management
    */
   {

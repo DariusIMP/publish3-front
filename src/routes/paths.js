@@ -45,6 +45,26 @@ export const paths = {
     root: ROOTS.DASHBOARD,
     two: `${ROOTS.DASHBOARD}/two`,
     three: `${ROOTS.DASHBOARD}/three`,
+    // Publications
+    publications: {
+      root: `${ROOTS.DASHBOARD}/publications`,
+      create: `${ROOTS.DASHBOARD}/publications/create`,
+      list: `${ROOTS.DASHBOARD}/publications/list`,
+      edit: (id) => `${ROOTS.DASHBOARD}/publications/${id}/edit`,
+      details: (id) => `${ROOTS.DASHBOARD}/publications/${id}`,
+    },
+    // Citations
+    citations: {
+      root: `${ROOTS.DASHBOARD}/citations`,
+      create: `${ROOTS.DASHBOARD}/citations/create`,
+      list: `${ROOTS.DASHBOARD}/citations/list`,
+    },
+    // Authors
+    authors: {
+      root: `${ROOTS.DASHBOARD}/authors`,
+      create: `${ROOTS.DASHBOARD}/authors/create`,
+      list: `${ROOTS.DASHBOARD}/authors/list`,
+    },
     group: {
       root: `${ROOTS.DASHBOARD}/group`,
       five: `${ROOTS.DASHBOARD}/group/five`,

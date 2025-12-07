@@ -53,32 +53,63 @@ export const fetcher = async (args) => {
 // ----------------------------------------------------------------------
 
 export const endpoints = {
-  chat: '/api/chat',
-  kanban: '/api/kanban',
-  calendar: '/api/calendar',
-
   auth: {
     me: '/api/auth/me',
     signIn: '/api/auth/sign-in',
     signUp: '/api/auth/sign-up',
   },
 
-  mail: {
-    list: '/api/mail/list',
-    details: '/api/mail/details',
-    labels: '/api/mail/labels',
+  // Publications
+  publications: {
+    create: '/publications/create',
+    get: (id) => `/publications/${id}`,
+    list: '/publications/list',
+    update: (id) => `/publications/${id}`,
+    delete: (id) => `/publications/${id}`,
+    searchByTitle: '/publications/search/title',
+    searchByTag: '/publications/search/tag',
+    listByUser: (userId) => `/publications/user/${userId}`,
+    getAuthors: (publicationId) => `/publications/${publicationId}/authors`,
+    getCitations: (publicationId) => `/publications/${publicationId}/citations`,
+    getCitedBy: (publicationId) => `/publications/${publicationId}/cited-by`,
   },
 
-  post: {
-    list: '/api/post/list',
-    details: '/api/post/details',
-    latest: '/api/post/latest',
-    search: '/api/post/search',
+  // Citations
+  citations: {
+    create: '/citations/create',
+    get: (id) => `/citations/${id}`,
+    list: '/citations/list',
+    update: (id) => `/citations/${id}`,
+    delete: (id) => `/citations/${id}`,
+    getByPublications: '/citations/by-publications',
   },
 
-  product: {
-    list: '/api/product/list',
-    details: '/api/product/details',
-    search: '/api/product/search',
+  // Authors
+  authors: {
+    create: '/authors/create',
+    get: (id) => `/authors/${id}`,
+    list: '/authors/list',
+    update: (id) => `/authors/${id}`,
+    delete: (id) => `/authors/${id}`,
+  },
+
+  // Users
+  users: {
+    create: '/users/create',
+    get: (id) => `/users/${id}`,
+    list: '/users/list',
+    update: (id) => `/users/${id}`,
+    delete: (id) => `/users/${id}`,
+  },
+
+  // Publication Authors (junction table)
+  publicationAuthors: {
+    create: '/publication-authors/create',
+    get: (id) => `/publication-authors/${id}`,
+    list: '/publication-authors/list',
+    update: (id) => `/publication-authors/${id}`,
+    delete: (id) => `/publication-authors/${id}`,
+    getByPublication: (publicationId) => `/publication-authors/publication/${publicationId}`,
+    getByAuthor: (authorId) => `/publication-authors/author/${authorId}`,
   },
 };
