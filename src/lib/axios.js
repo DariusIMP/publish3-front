@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAccessToken } from '@privy-io/react-auth';
 
 import { CONFIG } from 'src/global-config';
 
@@ -11,18 +12,17 @@ const axiosInstance = axios.create({
   },
 });
 
-/**
- * Optional: Add token (if using auth)
- *
- axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+axiosInstance.interceptors.request.use(async (config) => {
+  try {
+    const token = await getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.warn('Failed to add Privy token to the request:', error);
   }
   return config;
 });
-*
-*/
 
 axiosInstance.interceptors.response.use(
   (response) => response,
