@@ -95,7 +95,7 @@ export function AuthSplitSection({
                       component="img"
                       alt={option.label}
                       src={option.icon}
-                      sx={{ width: 32, height: 32 }}
+                      sx={{ width: 180, height: 32 }}
                     />
                   </Link>
                 </Tooltip>

@@ -9,23 +9,19 @@ import { CONFIG } from 'src/global-config';
 
 import { SplashScreen } from 'src/components/loading-screen';
 
-import { useAuthContext } from '../hooks';
+import { usePrivy } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
 const signInPaths = {
-  jwt: paths.auth.jwt.signIn,
-  auth0: paths.auth.auth0.signIn,
-  amplify: paths.auth.amplify.signIn,
-  firebase: paths.auth.firebase.signIn,
-  supabase: paths.auth.supabase.signIn,
+  privy: paths.auth.privy.signIn,
 };
 
 export function AuthGuard({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { authenticated, loading } = useAuthContext();
+  const { authenticated, ready } = usePrivy();
 
   const [isChecking, setIsChecking] = useState(true);
 
@@ -35,7 +31,7 @@ export function AuthGuard({ children }) {
   };
 
   const checkPermissions = async () => {
-    if (loading) {
+    if (!ready) {
       return;
     }
 
@@ -56,7 +52,7 @@ export function AuthGuard({ children }) {
   useEffect(() => {
     checkPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authenticated, loading]);
+  }, [authenticated, ready]);
 
   if (isChecking) {
     return <SplashScreen />;

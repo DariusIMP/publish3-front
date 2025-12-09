@@ -12,13 +12,14 @@ export const CONFIG = {
   isStaticExport: JSON.parse(process.env.BUILD_STATIC_EXPORT ?? 'false'),
   /**
    * Auth
-   * @method jwt | amplify | firebase | supabase | auth0
+   * @method jwt | privy
    */
   auth: {
-    method: 'jwt',
+    method: 'privy',
     skip: false,
     redirectPath: paths.dashboard.root,
   },
+  privyAppId: process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? '',
   /**
    * Mapbox
    */

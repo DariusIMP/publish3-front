@@ -4,27 +4,27 @@ import Button from '@mui/material/Button';
 
 import { useRouter } from 'src/routes/hooks';
 
-import { useAuthContext } from 'src/auth/hooks';
-import { signOut } from 'src/auth/context/jwt/action';
+import { usePrivy } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
 export function SignOutButton({ onClose, sx, ...other }) {
   const router = useRouter();
 
-  const { checkUserSession } = useAuthContext();
+  const { ready, authenticated, logout } = usePrivy();
+
+  const disableLogout = !ready || (ready && !authenticated);
 
   const handleLogout = useCallback(async () => {
     try {
-      await signOut();
-      await checkUserSession?.();
+      await logout();
 
       onClose?.();
       router.refresh();
     } catch (error) {
       console.error(error);
     }
-  }, [checkUserSession, onClose, router]);
+  }, [authenticated, onClose, router]);
 
   return (
     <Button
@@ -34,6 +34,7 @@ export function SignOutButton({ onClose, sx, ...other }) {
       color="error"
       onClick={handleLogout}
       sx={sx}
+      disabled={disableLogout}
       {...other}
     >
       Logout

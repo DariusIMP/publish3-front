@@ -8,7 +8,7 @@ import { CONFIG } from 'src/global-config';
 
 import { SplashScreen } from 'src/components/loading-screen';
 
-import { useAuthContext } from '../hooks';
+import { usePrivy } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -16,14 +16,14 @@ export function GuestGuard({ children }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { loading, authenticated } = useAuthContext();
+  const { ready, authenticated } = usePrivy();
 
   const returnTo = searchParams.get('returnTo') || CONFIG.auth.redirectPath;
 
   const [isChecking, setIsChecking] = useState(true);
 
   const checkPermissions = async () => {
-    if (loading) {
+    if (!ready) {
       return;
     }
 
@@ -38,7 +38,7 @@ export function GuestGuard({ children }) {
   useEffect(() => {
     checkPermissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authenticated, loading]);
+  }, [authenticated, ready]);
 
   if (isChecking) {
     return <SplashScreen />;
