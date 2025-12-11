@@ -9,7 +9,6 @@ const ROOTS = {
 
 export const paths = {
   faqs: '/faqs',
-  minimalStore: 'https://mui.com/store/items/minimal-dashboard/',
   // AUTH
   auth: {
     privy: {
@@ -40,7 +39,7 @@ export const paths = {
     // Authors
     authors: {
       root: `${ROOTS.DASHBOARD}/authors`,
-      create: `${ROOTS.DASHBOARD}/authors/create`,
+      register: `${ROOTS.DASHBOARD}/authors/register`,
       list: `${ROOTS.DASHBOARD}/authors/list`,
     },
   },

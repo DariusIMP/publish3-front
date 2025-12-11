@@ -7,6 +7,7 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
 import { paths } from 'src/routes/paths';
+import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/global-config';
 
@@ -63,6 +64,15 @@ export function NavUpgrade({ sx, ...other }) {
             {user?.email}
           </Typography>
         </Box>
+
+
+        <Button
+          variant="contained"
+          component={RouterLink}
+          href={paths.dashboard.authors.register}
+        >
+          Register as an author
+        </Button>
       </Box>
     </Box>
   );
