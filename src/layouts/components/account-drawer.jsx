@@ -24,9 +24,7 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { AnimateBorder } from 'src/components/animate';
 
-import { useMockedUser } from 'src/auth/hooks';
-
-import { UpgradeBlock } from './nav-upgrade';
+import { useAuthContext } from 'src/auth/hooks'
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
 
@@ -35,7 +33,7 @@ import { SignOutButton } from './sign-out-button';
 export function AccountDrawer({ data = [], sx, ...other }) {
   const pathname = usePathname();
 
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
@@ -157,47 +155,9 @@ export function AccountDrawer({ data = [], sx, ...other }) {
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              p: 3,
-              gap: 1,
-              flexWrap: 'wrap',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            {Array.from({ length: 3 }, (_, index) => (
-              <Tooltip
-                key={_mock.fullName(index + 1)}
-                title={`Switch to: ${_mock.fullName(index + 1)}`}
-              >
-                <Avatar
-                  alt={_mock.fullName(index + 1)}
-                  src={_mock.image.avatar(index + 1)}
-                  onClick={() => {}}
-                />
-              </Tooltip>
-            ))}
-
-            <Tooltip title="Add account">
-              <IconButton
-                sx={[
-                  (theme) => ({
-                    bgcolor: varAlpha(theme.vars.palette.grey['500Channel'], 0.08),
-                    border: `dashed 1px ${varAlpha(theme.vars.palette.grey['500Channel'], 0.32)}`,
-                  }),
-                ]}
-              >
-                <Iconify icon="mingcute:add-line" />
-              </IconButton>
-            </Tooltip>
-          </Box>
 
           {renderList()}
 
-          <Box sx={{ px: 2.5, py: 3 }}>
-            <UpgradeBlock />
-          </Box>
         </Scrollbar>
 
         <Box sx={{ p: 2.5 }}>

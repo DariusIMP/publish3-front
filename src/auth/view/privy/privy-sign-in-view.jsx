@@ -1,7 +1,8 @@
 'use client';
 
-import Button from '@mui/material/Button';
 import { useLogin, usePrivy } from '@privy-io/react-auth';
+
+import Button from '@mui/material/Button';
 
 // ----------------------------------------------------------------------
 
