@@ -18,7 +18,7 @@ import { useAuthContext } from 'src/auth/hooks'
 // ----------------------------------------------------------------------
 
 export function NavUpgrade({ sx, ...other }) {
-  const { user } = useAuthContext();
+  const { user, author } = useAuthContext();
 
   return (
     <Box
@@ -28,23 +28,8 @@ export function NavUpgrade({ sx, ...other }) {
       <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box sx={{ position: 'relative' }}>
           <Avatar src={user?.photoURL} alt={user?.displayName} sx={{ width: 48, height: 48 }}>
-            {user?.displayName?.charAt(0).toUpperCase()}
+            {author?.name?.charAt(0).toUpperCase()}
           </Avatar>
-
-          <Label
-            color="success"
-            variant="filled"
-            sx={{
-              top: -6,
-              px: 0.5,
-              left: 40,
-              height: 20,
-              position: 'absolute',
-              borderBottomLeftRadius: 2,
-            }}
-          >
-            Free
-          </Label>
         </Box>
 
         <Box sx={{ mb: 2, mt: 1.5, width: 1 }}>
@@ -53,7 +38,7 @@ export function NavUpgrade({ sx, ...other }) {
             noWrap
             sx={{ mb: 1, color: 'var(--layout-nav-text-primary-color)' }}
           >
-            {user?.displayName}
+            {author?.name}
           </Typography>
 
           <Typography
@@ -61,18 +46,20 @@ export function NavUpgrade({ sx, ...other }) {
             noWrap
             sx={{ color: 'var(--layout-nav-text-disabled-color)' }}
           >
-            {user?.email}
+            {author?.email}
           </Typography>
         </Box>
 
-
-        <Button
-          variant="contained"
-          component={RouterLink}
-          href={paths.dashboard.authors.register}
-        >
-          Register as an author
-        </Button>
+        {/* Only show "Register as an author" button if user is not already registered as author */}
+        {!author && (
+          <Button
+            variant="contained"
+            component={RouterLink}
+            href={paths.dashboard.authors.register}
+          >
+            Register as an author
+          </Button>
+        )}
       </Box>
     </Box>
   );

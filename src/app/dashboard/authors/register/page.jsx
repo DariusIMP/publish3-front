@@ -3,6 +3,7 @@
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { usePrivy } from '@privy-io/react-auth';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -16,6 +17,8 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { Form, Field } from 'src/components/hook-form';
+import { useAuthContext } from 'src/auth/hooks';
+import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -32,13 +35,15 @@ const AuthorRegisterSchema = zod.object({
 
 export default function AuthorRegisterPage() {
   const router = useRouter();
+  const { user, updateAuthor } = useAuthContext();
+  const { user: privyUser } = usePrivy();
 
   const methods = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(AuthorRegisterSchema),
     defaultValues: {
-      name: '',
-      email: '',
+      name: user?.displayName || '',
+      email: user?.email || '',
       affiliation: '',
     },
   });
@@ -50,14 +55,45 @@ export default function AuthorRegisterPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      console.log('Author registration data:', data);
-      // TODO: Implement API call to register author
-      alert('Author registration submitted! (API integration pending)');
+      if (!privyUser?.id) {
+        throw new Error('User not authenticated. Please sign in.');
+      }
+
+      const authorData = {
+        privy_id: privyUser.id,
+        name: data.name,
+        email: data.email,
+        affiliation: data.affiliation,
+      };
+
+      console.log('Creating author with data:', authorData);
+      
+      const response = await axiosInstance.post(endpoints.authors.create, authorData);
+      
+      console.log('Author created successfully:', response.data);
+      
+      // Update AuthContext with the newly created author
+      updateAuthor(response.data);
+      
+      alert('Author registered successfully!');
+      
       // Redirect to authors list after successful registration
       router.push(paths.dashboard.authors.list);
     } catch (error) {
       console.error('Failed to register author:', error);
-      alert(`Failed to register author: ${error.message}`);
+      
+      let errorMessage = error.message || 'Failed to register author';
+      
+      // Check for specific error messages from backend
+      if (errorMessage.includes('Author with that email already exists')) {
+        errorMessage = 'An author with this email already exists.';
+      } else if (errorMessage.includes('Author with that privy_id already exists')) {
+        errorMessage = 'You are already registered as an author.';
+      } else if (errorMessage.includes('User not authenticated')) {
+        errorMessage = 'Please sign in to register as an author.';
+      }
+      
+      alert(`Error: ${errorMessage}`);
     }
   });
 
