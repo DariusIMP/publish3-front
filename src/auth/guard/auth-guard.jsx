@@ -10,6 +10,7 @@ import { CONFIG } from 'src/global-config';
 import { SplashScreen } from 'src/components/loading-screen';
 
 import { usePrivy } from '@privy-io/react-auth';
+import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ export function AuthGuard({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { authenticated, ready } = usePrivy();
+  const { authenticated, ready, user } = usePrivy();
 
   const [isChecking, setIsChecking] = useState(true);
 
@@ -29,6 +30,22 @@ export function AuthGuard({ children }) {
     const queryString = new URLSearchParams({ returnTo: pathname }).toString();
     return `${currentPath}?${queryString}`;
   };
+
+  useEffect(() => {
+    const handleBackendSignIn = async () => {
+      console.log('User authenticated with Privy, calling backend sign-in', user);
+      try {
+        const response = await axiosInstance.post(endpoints.users.signin);
+        console.log('Backend sign-in successful:', response.data);
+      } catch (backendError) {
+        console.error('Failed to sign in with backend:', backendError);
+      }
+    }
+
+    if (user) {
+      handleBackendSignIn();
+    }
+  }, [user]);
 
   const checkPermissions = async () => {
     if (!ready) {
@@ -42,7 +59,6 @@ export function AuthGuard({ children }) {
       const redirectPath = createRedirectPath(signInPath);
 
       router.replace(redirectPath);
-
       return;
     }
 

@@ -95,6 +95,7 @@ export const endpoints = {
 
   // Users
   users: {
+    signin: '/users/privy/sign-in',
     create: '/users/create',
     get: (id) => `/users/${id}`,
     list: '/users/list',
