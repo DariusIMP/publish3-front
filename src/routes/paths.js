@@ -23,8 +23,6 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
-    two: `${ROOTS.DASHBOARD}/two`,
-    three: `${ROOTS.DASHBOARD}/three`,
     // Publications
     publications: {
       root: `${ROOTS.DASHBOARD}/publications`,
@@ -44,11 +42,6 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/authors`,
       create: `${ROOTS.DASHBOARD}/authors/create`,
       list: `${ROOTS.DASHBOARD}/authors/list`,
-    },
-    group: {
-      root: `${ROOTS.DASHBOARD}/group`,
-      five: `${ROOTS.DASHBOARD}/group/five`,
-      six: `${ROOTS.DASHBOARD}/group/six`,
     },
   },
 };

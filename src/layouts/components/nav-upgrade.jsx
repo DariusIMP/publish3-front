@@ -63,15 +63,6 @@ export function NavUpgrade({ sx, ...other }) {
             {user?.email}
           </Typography>
         </Box>
-
-        <Button
-          variant="contained"
-          href={paths.minimalStore}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Upgrade to Pro
-        </Button>
       </Box>
     </Box>
   );
