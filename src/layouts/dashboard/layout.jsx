@@ -38,7 +38,7 @@ import { MainSection, layoutClasses, HeaderSection, LayoutSection } from '../cor
 export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery = 'lg' }) {
   const theme = useTheme();
 
-  const { user } = useAuthContext();
+  const { user, author } = useAuthContext();
 
   const settings = useSettingsContext();
 
@@ -52,7 +52,17 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
   const isNavHorizontal = settings.state.navLayout === 'horizontal';
   const isNavVertical = isNavMini || settings.state.navLayout === 'vertical';
 
-  const canDisplayItemByRole = (allowedRoles) => !allowedRoles?.includes(user?.role);
+  const canDisplayItem = (item) => {
+    if (item.allowedRoles && item.allowedRoles.includes(user?.role)) {
+      return false;
+    }
+    
+    if (item.requiresAuthor && !author) {
+      return false;
+    }
+    
+    return true;
+  };
 
   const renderHeader = () => {
     const headerSlotProps = {
@@ -80,7 +90,7 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
           data={navData}
           layoutQuery={layoutQuery}
           cssVars={navVars.section}
-          checkPermissions={canDisplayItemByRole}
+          checkPermissions={canDisplayItem}
         />
       ) : null,
       leftArea: (
@@ -95,7 +105,7 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
             open={open}
             onClose={onClose}
             cssVars={navVars.section}
-            checkPermissions={canDisplayItemByRole}
+            checkPermissions={canDisplayItem}
           />
 
           {/** @slot Logo */}
@@ -154,7 +164,7 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
       isNavMini={isNavMini}
       layoutQuery={layoutQuery}
       cssVars={navVars.section}
-      checkPermissions={canDisplayItemByRole}
+      checkPermissions={canDisplayItem}
       onToggleNav={() =>
         settings.setField(
           'navLayout',

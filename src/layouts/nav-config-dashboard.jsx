@@ -51,6 +51,7 @@ export const navData = [
         title: 'Upload Paper',
         path: paths.dashboard.publications.create,
         icon: ICONS.file,
+        requiresAuthor: true, // Only show if user is registered as author
       },
       {
         title: 'Browse Papers',
