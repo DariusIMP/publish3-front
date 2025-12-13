@@ -1943,7 +1943,7 @@
   resolved "https://registry.npmjs.org/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.84.tgz"
   integrity sha512-YSs8ncurc1xzegUMNnQUTYrdrAuaXdPMOa+iYYyAxydOtg0ppV386hyYMsy00Yip1NlTgLCseRG4sHSnjQx6og==
 
-"@napi-rs/canvas@^0.1.80", "@napi-rs/canvas@^0.1.81":
+"@napi-rs/canvas@^0.1.80":
   version "0.1.84"
   resolved "https://registry.npmjs.org/@napi-rs/canvas/-/canvas-0.1.84.tgz"
   integrity sha512-88FTNFs4uuiFKP0tUrPsEXhpe9dg7za9ILZJE08pGdUveMIDeana1zwfVkqRHJDPJFAmGY3dXmJ99dzsy57YnA==
@@ -2600,12 +2600,12 @@
 
 "@solana-program/memo@^0.10.0":
   version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@solana-program/memo/-/memo-0.10.0.tgz#6d98282f73f697d33039b629c911e3825e4eed22"
+  resolved "https://registry.npmjs.org/@solana-program/memo/-/memo-0.10.0.tgz"
   integrity sha512-1FvQFenL3lzl5SpxhWV4QJCOLU/nvAOXGXjKjS7dprvG+0u971xoanApN7bM/a4NFZolp6S+lP2xVl6vTVIxbg==
 
 "@solana-program/system@^0.10.0":
   version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@solana-program/system/-/system-0.10.0.tgz#f68ffb0a3e1c1d5e68ecfe111fbbe729f95a582a"
+  resolved "https://registry.npmjs.org/@solana-program/system/-/system-0.10.0.tgz"
   integrity sha512-Go+LOEZmqmNlfr+Gjy5ZWAdY5HbYzk2RBewD9QinEU/bBSzpFfzqDRT55JjFRBGJUvMgf3C2vfXEGT4i8DSI4g==
 
 "@solana-program/system@^0.8.0":
@@ -2625,7 +2625,7 @@
 
 "@solana-program/token@^0.9.0":
   version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@solana-program/token/-/token-0.9.0.tgz#9582068c6053b1600472eedb3fe084b262cbc1c7"
+  resolved "https://registry.npmjs.org/@solana-program/token/-/token-0.9.0.tgz"
   integrity sha512-vnZxndd4ED4Fc56sw93cWZ2djEeeOFxtaPS8SPf5+a+JZjKA/EnKqzbE1y04FuMhIVrLERQ8uR8H2h72eZzlsA==
 
 "@solana/accounts@3.0.3":
@@ -2929,7 +2929,7 @@
 
 "@solana/kit@^5.0.0":
   version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@solana/kit/-/kit-5.0.0.tgz#2c6f675599021a7c9cf512c4a422a2ea21782dae"
+  resolved "https://registry.npmjs.org/@solana/kit/-/kit-5.0.0.tgz"
   integrity sha512-3ahtzmmMgU+1l2YMhQJSKKm14IdvCycOE/m4XNMu/4icBIptmBgZxrmgRpPHqBilBa+Krp/hBuTg4HWl9IAgWw==
   dependencies:
     "@solana/accounts" "5.0.0"
@@ -7123,13 +7123,6 @@ pdfjs-dist@5.4.296:
   integrity sha512-DlOzet0HO7OEnmUmB6wWGJrrdvbyJKftI1bhMitK7O2N8W2gc757yyYBbINy9IDafXAV9wmKr9t7xsTaNKRG5Q==
   optionalDependencies:
     "@napi-rs/canvas" "^0.1.80"
-
-pdfjs-dist@^5.4.296:
-  version "5.4.449"
-  resolved "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.4.449.tgz"
-  integrity sha512-CegnUaT0QwAyQMS+7o2POr4wWUNNe8VaKKlcuoRHeYo98cVnqPpwOXNSx6Trl6szH02JrRcsPgletV6GmF3LtQ==
-  optionalDependencies:
-    "@napi-rs/canvas" "^0.1.81"
 
 picocolors@^1.0.0, picocolors@^1.1.1:
   version "1.1.1"

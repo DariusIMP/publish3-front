@@ -3,20 +3,23 @@
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
-import React, { useState, useCallback } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
+import { getAuthorsList } from 'src/actions/authors';
 import axiosInstance, { endpoints } from 'src/lib/axios';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { getPublicationsList } from 'src/actions/publications/action';
 
 import { Form, Field } from 'src/components/hook-form';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
@@ -29,7 +32,8 @@ const PublicationCreateSchema = zod.object({
   title: zod.string().min(1, { message: 'Title is required!' }),
   about: zod.string().optional(),
   tags: zod.string().optional(), // Will be stored as JSON string
-  userId: zod.string().optional(), // Optional user ID
+  authors: zod.array(zod.any()).optional(),
+  citations: zod.array(zod.any()).optional(),
 });
 
 // ----------------------------------------------------------------------
@@ -141,6 +145,10 @@ export function PublicationCreateView() {
   const [tags, setTags] = useState([]);
   const [inputTag, setInputTag] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authors, setAuthors] = useState([]);
+  const [selectedAuthors, setSelectedAuthors] = useState([]);
+  const [publications, setPublications] = useState([]);
+  const [selectedCitations, setSelectedCitations] = useState([]);
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -149,13 +157,41 @@ export function PublicationCreateView() {
       title: '',
       about: '',
       tags: '[]',
-      userId: '',
+      authors: [],
+      citations: [],
     },
   });
 
   const {
     handleSubmit,
+    setValue,
   } = methods;
+
+  useEffect(() => {
+    async function loadAuthors() {
+      try {
+        const authorsData = await getAuthorsList();
+        setAuthors(authorsData);
+      } catch (error) {
+        console.error('Error loading authors:', error);
+      }
+    }
+
+    loadAuthors();
+  }, []);
+
+  useEffect(() => {
+    async function loadPublications() {
+      try {
+        const publicationsData = await getPublicationsList();
+        setPublications(publicationsData);
+      } catch (error) {
+        console.error('Error loading publications:', error);
+      }
+    }
+
+    loadPublications();
+  }, []);
 
   const handleDrop = useCallback((files) => {
     const file = files[0];
@@ -204,15 +240,24 @@ export function PublicationCreateView() {
       formData.append('file', selectedFile);
 
       // Add other fields
-      if (data.userId) {
-        formData.append('userId', data.userId);
-      }
       formData.append('title', data.title);
       if (data.about) {
         formData.append('about', data.about);
       }
       if (data.tags && data.tags !== '[]') {
         formData.append('tags', data.tags);
+      }
+
+      // Add authors as JSON array if any are selected
+      if (selectedAuthors.length > 0) {
+        const authorIds = selectedAuthors.map(author => author.privy_id);
+        formData.append('authors', JSON.stringify(authorIds));
+      }
+
+      // Add citations as JSON array if any are selected
+      if (selectedCitations.length > 0) {
+        const citationIds = selectedCitations.map(pub => pub.id);
+        formData.append('citations', JSON.stringify(citationIds));
       }
 
       // Send request with multipart/form-data
@@ -341,38 +386,72 @@ export function PublicationCreateView() {
               <input type="hidden" {...methods.register('tags')} />
             </Box>
 
+
+            {/* Authors section */}
             <Box sx={{ mt: 3 }}>
-              <Field.Text
-                name="userId"
-                label="User ID (Optional)"
-                fullWidth
-                variant="outlined"
-                placeholder="Enter user ID if applicable"
-                helperText="Leave empty if no specific user"
+              <InputLabel sx={{ mb: 1 }}>Authors</InputLabel>
+              <Autocomplete
+                multiple
+                options={authors}
+                getOptionLabel={(option) => `${option.name}${option.email ? ` (${option.email})` : ''}`}
+                isOptionEqualToValue={(option, value) => option?.privy_id === value?.privy_id}
+                value={selectedAuthors}
+                onChange={(event, value) => {
+                  setSelectedAuthors(value);
+                  setValue('authors', value, { shouldValidate: true });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Select authors"
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      {...getTagProps({ index })}
+                      key={option.privy_id}
+                      label={option.name}
+                      size="small"
+                      color="info"
+                      variant="soft"
+                    />
+                  ))
+                }
               />
             </Box>
 
-            {/* Authors section - placeholder for now */}
+            {/* Citations section */}
             <Box sx={{ mt: 3 }}>
-              <InputLabel sx={{ mb: 1 }}>Authors (Coming Soon)</InputLabel>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Author management will be added in a future update"
-                disabled
-                size="small"
-              />
-            </Box>
-
-            {/* Citations section - placeholder for now */}
-            <Box sx={{ mt: 3 }}>
-              <InputLabel sx={{ mb: 1 }}>Citations (Coming Soon)</InputLabel>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Citation management will be added in a future update"
-                disabled
-                size="small"
+              <InputLabel sx={{ mb: 1 }}>Citations</InputLabel>
+              <Autocomplete
+                multiple
+                options={publications}
+                getOptionLabel={(option) => `${option.title}${option.about ? ` - ${option.about.substring(0, 50)}...` : ''}`}
+                isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                value={selectedCitations}
+                onChange={(event, value) => {
+                  setSelectedCitations(value);
+                  setValue('citations', value, { shouldValidate: true });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Select publications to cite"
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      {...getTagProps({ index })}
+                      key={option.id}
+                      label={option.title.substring(0, 30) + (option.title.length > 30 ? '...' : '')}
+                      size="small"
+                      color="secondary"
+                      variant="soft"
+                    />
+                  ))
+                }
               />
             </Box>
 

@@ -105,12 +105,6 @@ export const endpoints = {
 
   // Publication Authors (junction table)
   publicationAuthors: {
-    create: '/publication-authors/create',
-    get: (id) => `/publication-authors/${id}`,
-    list: '/publication-authors/list',
-    update: (id) => `/publication-authors/${id}`,
-    delete: (id) => `/publication-authors/${id}`,
-    getByPublication: (publicationId) => `/publication-authors/publication/${publicationId}`,
-    getByAuthor: (authorId) => `/publication-authors/author/${authorId}`,
+    set: '/publication-authors/set',
   },
 };
