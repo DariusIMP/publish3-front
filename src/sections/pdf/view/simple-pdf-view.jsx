@@ -16,33 +16,56 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-export function SimplePdfView({ pdfFile, scale = 1 }) {
+export function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale = 1 }) {
   const [numPages, setNumPages] = useState(0);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Create object URL for the file
   useEffect(() => {
     if (pdfFile) {
       const url = URL.createObjectURL(pdfFile);
       setPdfUrl(url);
+      setError(null);
 
-      // Clean up the object URL when component unmounts or file changes
       return () => {
         URL.revokeObjectURL(url);
       };
+    } else if (externalPdfUrl) {
+      setPdfUrl(externalPdfUrl);
+      setError(null);
+    } else {
+      setPdfUrl(null);
     }
-  }, [pdfFile]);
+  }, [pdfFile, externalPdfUrl]);
 
   const onDocumentLoadSuccess = ({ numPages: totalNumPages }) => {
     setNumPages(totalNumPages);
+    setError(null);
   };
 
-  if (!pdfFile || !pdfUrl) {
+  const onDocumentLoadError = (err) => {
+    console.error('Error loading PDF:', err);
+    setError('Failed to load PDF. The file may be corrupted or inaccessible.');
+  };
+
+  if (!pdfUrl) {
     return (
       <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ textAlign: 'center' }}>
           <Box sx={{ typography: 'body1', color: 'text.secondary' }}>
             No PDF file selected
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <Box sx={{ typography: 'body1', color: 'error.main' }}>
+            {error}
           </Box>
         </Box>
       </Box>
@@ -55,6 +78,7 @@ export function SimplePdfView({ pdfFile, scale = 1 }) {
         <Document
           file={pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
+          onLoadError={onDocumentLoadError}
           className="react-pdf__Document"
         >
           {[...Array(numPages)].map((_, index) => (

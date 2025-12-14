@@ -29,6 +29,7 @@ export const paths = {
       list: `${ROOTS.DASHBOARD}/publications/list`,
       edit: (id) => `${ROOTS.DASHBOARD}/publications/${id}/edit`,
       details: (id) => `${ROOTS.DASHBOARD}/publications/${id}`,
+      read: (id) => `${ROOTS.DASHBOARD}/publications/${id}/read`,
     },
     // Citations
     citations: {

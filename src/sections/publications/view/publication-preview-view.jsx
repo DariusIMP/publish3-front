@@ -223,8 +223,8 @@ export function PublicationPreviewView({ id }) {
                   startIcon={<Iconify icon="solar:cart-bold" />}
                   sx={{ minWidth: 200 }}
                   onClick={() => {
-                    // TODO: Implement purchase functionality
-                    alert('Purchase functionality will be implemented soon!');
+                    // TODO: Implement actual purchase functionality
+                    router.push(paths.dashboard.publications.read(id));
                   }}
                 >
                   Purchase Paper

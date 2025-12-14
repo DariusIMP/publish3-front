@@ -55,3 +55,15 @@ export const getPublication = async (id) => {
 };
 
 // ----------------------------------------------------------------------
+
+export const getPublicationPdfUrl = async (id) => {
+    try {
+        const response = await axiosInstance.get(endpoints.publications.getPdfUrl(id));
+        return response.data;
+    } catch (error) {
+        console.error('Error during get publication PDF URL:', error);
+        throw error;
+    }
+};
+
+// ----------------------------------------------------------------------
