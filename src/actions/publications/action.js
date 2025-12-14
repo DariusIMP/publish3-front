@@ -44,3 +44,14 @@ export const searchPublicationsByTag = async (tag) => {
 
 // ----------------------------------------------------------------------
 
+export const getPublication = async (id) => {
+    try {
+        const response = await axiosInstance.get(endpoints.publications.get(id));
+        return response.data;
+    } catch (error) {
+        console.error('Error during get publication:', error);
+        throw error;
+    }
+};
+
+// ----------------------------------------------------------------------

@@ -24,11 +24,11 @@ export function PublicationItemHorizontal({ sx, publication, detailsHref, ...oth
   const displayTags = publication.tags ? publication.tags.slice(0, 3) : [];
 
   return (
-    <Card 
+    <Card
       component={RouterLink}
       href={detailsHref}
       sx={[
-        { 
+        {
           display: 'flex',
           textDecoration: 'none',
           cursor: 'pointer',
@@ -37,9 +37,9 @@ export function PublicationItemHorizontal({ sx, publication, detailsHref, ...oth
             transform: 'translateY(-4px)',
             boxShadow: (theme) => theme.shadows[8],
           }
-        }, 
+        },
         ...(Array.isArray(sx) ? sx : [sx])
-      ]} 
+      ]}
       {...other}
     >
       <Stack
@@ -93,19 +93,33 @@ export function PublicationItemHorizontal({ sx, publication, detailsHref, ...oth
             {publication.about || 'No description available'}
           </Typography>
 
-          {/* Authors */}
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-            }}
-          >
-            <Iconify icon="solar:user-bold" width={14} />
-            {authorsText}
-          </Typography>
+          <Box sx={{ mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 0.5,
+              }}
+            >
+              <Iconify icon="solar:user-bold" width={14} sx={{ mt: 0.25, flexShrink: 0 }} />
+              <Box>
+                {authorsText}
+                {publication.authors && publication.authors.some(a => a.affiliation) && (
+                  <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.25 }}>
+                    {publication.authors
+                      .filter(a => a.affiliation)
+                      .map(a => a.affiliation)
+                      .filter((affil, index, arr) => arr.indexOf(affil) === index)
+                      .slice(0, 2)
+                      .join(', ')}
+                    {publication.authors.filter(a => a.affiliation).length > 2 && '...'}
+                  </Typography>
+                )}
+              </Box>
+            </Typography>
+          </Box>
 
           {/* Tags */}
           {displayTags.length > 0 && (
@@ -186,7 +200,7 @@ export function PublicationItemHorizontal({ sx, publication, detailsHref, ...oth
         >
           <Iconify icon="solar:document-bold" width={64} sx={{ color: 'text.disabled' }} />
         </Box>
-        
+
         {/* First author avatar if available */}
         {publication.authors && publication.authors.length > 0 && publication.authors[0].name && (
           <Avatar
