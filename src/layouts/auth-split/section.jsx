@@ -16,9 +16,9 @@ export function AuthSplitSection({
   method,
   methods,
   layoutQuery = 'md',
-  title = 'Manage the job',
-  imgUrl = `${CONFIG.assetsDir}/assets/illustrations/illustration-dashboard.webp`,
-  subtitle = 'More effectively with optimized workflows.',
+  title = 'Publish & Earn',
+  imgUrl = `${CONFIG.assetsDir}/assets/illustrations/illustration-dashboard.png`,
+  subtitle = 'Mint research papers as on-chain assets and earn micro-royalties from downloads and citations.',
   ...other
 }) {
   return (
@@ -31,8 +31,8 @@ export function AuthSplitSection({
               `url(${CONFIG.assetsDir}/assets/background/background-3-blur.webp)`,
             ],
           }),
-          px: 3,
-          pb: 3,
+          px: 0,
+          pb: 0,
           width: 1,
           maxWidth: 480,
           display: 'none',
@@ -66,7 +66,7 @@ export function AuthSplitSection({
         component="img"
         alt="Dashboard illustration"
         src={imgUrl}
-        sx={{ width: 1, aspectRatio: '4/3', objectFit: 'cover' }}
+        sx={{ width: 1, aspectRatio: '3/3', objectFit: 'cover' }}
       />
 
       {!!methods?.length && method && (
