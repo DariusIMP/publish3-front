@@ -26,7 +26,7 @@ export const metadata = {
   icons: [
     {
       rel: 'icon',
-      url: `${CONFIG.assetsDir}/favicon.ico`,
+      url: `${CONFIG.assetsDir}/logo/publish3-logo-single.png`,
     },
   ],
 };

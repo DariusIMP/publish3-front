@@ -56,11 +56,11 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
     if (item.allowedRoles && item.allowedRoles.includes(user?.role)) {
       return false;
     }
-    
+
     if (item.requiresAuthor && !author) {
       return false;
     }
-    
+
     return true;
   };
 
@@ -111,6 +111,7 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
           {/** @slot Logo */}
           {isNavHorizontal && (
             <Logo
+              isSingle={false}
               sx={{
                 display: 'none',
                 [theme.breakpoints.up(layoutQuery)]: { display: 'inline-flex' },
