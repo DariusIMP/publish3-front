@@ -13,6 +13,7 @@ import { detectSettings } from 'src/components/settings/server';
 import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/settings';
 
 import { AuthProvider } from 'src/auth/context/privy';
+import { MovementProvider } from 'src/context/movement';
 
 // ----------------------------------------------------------------------
 
@@ -61,25 +62,27 @@ export default async function RootLayout({ children }) {
           defaultMode={themeConfig.defaultMode}
         />
 
-        <AuthProvider>
-          <SettingsProvider
-            cookieSettings={appConfig.cookieSettings}
-            defaultSettings={defaultSettings}
-          >
-            <AppRouterCacheProvider options={{ key: 'css' }}>
-              <ThemeProvider
-                modeStorageKey={themeConfig.modeStorageKey}
-                defaultMode={themeConfig.defaultMode}
-              >
-                <MotionLazy>
-                  <ProgressBar />
-                  <SettingsDrawer defaultSettings={defaultSettings} />
-                  {children}
-                </MotionLazy>
-              </ThemeProvider>
-            </AppRouterCacheProvider>
-          </SettingsProvider>
-        </AuthProvider>
+        <MovementProvider>
+          <AuthProvider>
+            <SettingsProvider
+              cookieSettings={appConfig.cookieSettings}
+              defaultSettings={defaultSettings}
+            >
+              <AppRouterCacheProvider options={{ key: 'css' }}>
+                <ThemeProvider
+                  modeStorageKey={themeConfig.modeStorageKey}
+                  defaultMode={themeConfig.defaultMode}
+                >
+                  <MotionLazy>
+                    <ProgressBar />
+                    <SettingsDrawer defaultSettings={defaultSettings} />
+                    {children}
+                  </MotionLazy>
+                </ThemeProvider>
+              </AppRouterCacheProvider>
+            </SettingsProvider>
+          </AuthProvider>
+        </MovementProvider>
       </body>
     </html>
   );

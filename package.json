@@ -24,6 +24,7 @@
   },
   "packageManager": "yarn@1.22.22",
   "dependencies": {
+    "@aptos-labs/ts-sdk": "^5.2.0",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
