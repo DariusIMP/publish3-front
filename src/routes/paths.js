@@ -42,6 +42,10 @@ export const paths = {
       root: `${ROOTS.DASHBOARD}/authors`,
       register: `${ROOTS.DASHBOARD}/authors/register`,
       list: `${ROOTS.DASHBOARD}/authors/list`,
+      details: {
+        view: `${ROOTS.DASHBOARD}/authors/details`,
+        edit: `${ROOTS.DASHBOARD}/authors/details/edit`,
+      },
     },
   },
 };

@@ -34,6 +34,8 @@ const PublicationCreateSchema = zod.object({
   tags: zod.string().optional(), // Will be stored as JSON string
   authors: zod.array(zod.any()).optional(),
   citations: zod.array(zod.any()).optional(),
+  price: zod.number().min(0, { message: 'Price must be non-negative' }),
+  citationRoyaltyBps: zod.number().min(0).max(10000, { message: 'Citation royalty must be between 0 and 10000 basis points (0-100%)' }),
 });
 
 // ----------------------------------------------------------------------
@@ -159,6 +161,8 @@ export function PublicationCreateView() {
       tags: '[]',
       authors: [],
       citations: [],
+      price: 0,
+      citationRoyaltyBps: 0,
     },
   });
 
@@ -248,6 +252,10 @@ export function PublicationCreateView() {
         formData.append('tags', data.tags);
       }
 
+      // Add blockchain fields
+      formData.append('price', data.price);
+      formData.append('citation_royalty_bps', data.citationRoyaltyBps);
+
       // Add authors as JSON array if any are selected
       if (selectedAuthors.length > 0) {
         const authorIds = selectedAuthors.map(author => author.privy_id);
@@ -268,6 +276,26 @@ export function PublicationCreateView() {
       });
 
       console.info('Publication created successfully:', response.data);
+
+      // After creating the publication, prepare blockchain transaction
+      const publicationId = response.data.id;
+      
+      // TODO: Uncomment this when blockchain integration is fully ready
+      // // Call the blockchain preparation endpoint
+      // try {
+      //   const blockchainResponse = await axiosInstance.get(
+      //     `${endpoints.publications.prepareBlockchainPublish(publicationId)}?price=${data.price}&citation_royalty_bps=${data.citationRoyaltyBps}`
+      //   );
+      //   console.info('Blockchain transaction prepared:', blockchainResponse.data);
+      //   alert('Publication created successfully! Blockchain transaction prepared.');
+      // } catch (blockchainError) {
+      //   console.error('Failed to prepare blockchain transaction:', blockchainError);
+      //   // Still show success for publication creation
+      //   alert('Publication created successfully! Blockchain transaction preparation failed. You can try again later.');
+      // }
+
+      // For now, just show success for publication creation
+      alert('Publication created successfully! Blockchain integration will be available soon.');
 
       // Redirect to publications list
       router.push(paths.dashboard.publications.list);
@@ -418,6 +446,37 @@ export function PublicationCreateView() {
                     />
                   ))
                 }
+              />
+            </Box>
+
+            {/* Price field */}
+            <Box sx={{ mt: 3 }}>
+              <Field.Text
+                name="price"
+                label="Price (in smallest unit)"
+                fullWidth
+                variant="outlined"
+                type="number"
+                placeholder="Enter price for purchasing this paper"
+                InputProps={{
+                  inputProps: { min: 0 }
+                }}
+              />
+            </Box>
+
+            {/* Citation royalty field */}
+            <Box sx={{ mt: 3 }}>
+              <Field.Text
+                name="citationRoyaltyBps"
+                label="Citation Royalty (basis points, 100 = 1%)"
+                fullWidth
+                variant="outlined"
+                type="number"
+                placeholder="Enter citation royalty percentage in basis points"
+                helperText="Basis points: 100 = 1%, 1000 = 10%, 10000 = 100%"
+                InputProps={{
+                  inputProps: { min: 0, max: 10000 }
+                }}
               />
             </Box>
 

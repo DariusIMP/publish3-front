@@ -4,11 +4,14 @@ import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePrivy } from '@privy-io/react-auth';
+import { useCreateWallet } from '@privy-io/react-auth/extended-chains';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -37,6 +40,7 @@ export default function AuthorRegisterPage() {
   const router = useRouter();
   const { user, updateAuthor } = useAuthContext();
   const { user: privyUser } = usePrivy();
+  const { createWallet, isLoading: isCreatingWallet } = useCreateWallet();
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -59,40 +63,46 @@ export default function AuthorRegisterPage() {
         throw new Error('User not authenticated. Please sign in.');
       }
 
+      // Create Movement embedded wallet for the author
+      let walletAddress;
+      try {
+        const result = await createWallet({ chainType: 'movement' });
+        if (!result.wallet) {
+          throw new Error('Failed to create wallet: No wallet returned');
+        }
+        walletAddress = result.wallet.address;
+        console.log('Created Movement embedded wallet:', walletAddress);
+      } catch (walletError) {
+        console.error('Failed to create Movement wallet:', walletError);
+        throw new Error(`Failed to create payment wallet: ${walletError.message}`);
+      }
+
       const authorData = {
         privy_id: privyUser.id,
         name: data.name,
         email: data.email,
         affiliation: data.affiliation,
+        wallet_address: walletAddress,
       };
 
       console.log('Creating author with data:', authorData);
-      
+
       const response = await axiosInstance.post(endpoints.authors.create, authorData);
-      
+
       console.log('Author created successfully:', response.data);
-      
+
       // Update AuthContext with the newly created author
       updateAuthor(response.data);
-      
-      alert('Author registered successfully!');
-      
+
+      alert('Author registered successfully! Your Movement embedded wallet has been created for receiving payments.');
+
       // Redirect to authors list after successful registration
       router.push(paths.dashboard.authors.list);
     } catch (error) {
       console.error('Failed to register author:', error);
-      
+
       let errorMessage = error.message || 'Failed to register author';
-      
-      // Check for specific error messages from backend
-      if (errorMessage.includes('Author with that email already exists')) {
-        errorMessage = 'An author with this email already exists.';
-      } else if (errorMessage.includes('Author with that privy_id already exists')) {
-        errorMessage = 'You are already registered as an author.';
-      } else if (errorMessage.includes('User not authenticated')) {
-        errorMessage = 'Please sign in to register as an author.';
-      }
-      
+
       alert(`Error: ${errorMessage}`);
     }
   });
@@ -168,9 +178,10 @@ export default function AuthorRegisterPage() {
               <Button
                 type="submit"
                 variant="contained"
-                loading={isSubmitting}
+                loading={isSubmitting || isCreatingWallet}
+                disabled={isSubmitting || isCreatingWallet}
               >
-                Register Author
+                {isSubmitting || isCreatingWallet ? 'Creating Wallet & Registering...' : 'Register Author'}
               </Button>
             </Box>
           </Form>

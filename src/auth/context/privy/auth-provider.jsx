@@ -12,7 +12,7 @@ import { AuthContext } from '../auth-context';
 
 function AuthProviderContent({ children }) {
   const { authenticated, ready } = usePrivy();
-  
+
   const [user, setUser] = useState(null);
   const [author, setAuthor] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,11 +28,11 @@ function AuthProviderContent({ children }) {
 
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await axiosInstance.post(endpoints.users.signin);
       console.log('Backend data:', response.data);
-      
+
       setUser(response.data.user);
       setAuthor(response.data.author);
     } catch (err) {
@@ -78,13 +78,6 @@ export function AuthProvider({ children }) {
   return (
     <PrivyProvider
       appId={CONFIG.privyAppId}
-      config={{
-        embeddedWallets: {
-          ethereum: {
-            createOnLogin: 'users-without-wallets'
-          }
-        }
-      }}
     >
       <AuthProviderContent>
         {children}

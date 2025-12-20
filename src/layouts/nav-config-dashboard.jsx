@@ -42,17 +42,11 @@ const ICONS = {
 
 export const navData = [
   /**
-   * Publications Management
+   * Publications Management - For All Users
    */
   {
     subheader: 'Publications',
     items: [
-      {
-        title: 'Upload Paper',
-        path: paths.dashboard.publications.create,
-        icon: ICONS.file,
-        requiresAuthor: true, // Only show if user is registered as author
-      },
       {
         title: 'Browse Papers',
         path: paths.dashboard.publications.list,
@@ -64,9 +58,37 @@ export const navData = [
         icon: ICONS.user,
       },
       {
+        title: 'My Purchased Papers',
+        path: paths.dashboard.publications.list, // TODO: Create purchased papers page
+        icon: ICONS.file,
+        description: 'View papers you have purchased (Coming Soon)',
+      },
+      {
         title: 'Citations',
         path: paths.dashboard.citations.list,
         icon: ICONS.label,
+      },
+    ],
+  },
+  
+  /**
+   * Author Dashboard - Only for Registered Authors
+   */
+  {
+    subheader: 'Author Dashboard',
+    requiresAuthor: true,
+    items: [
+      {
+        title: 'Upload Paper',
+        path: paths.dashboard.publications.create,
+        icon: ICONS.file,
+        requiresAuthor: true,
+      },
+      {
+        title: 'Author Profile',
+        path: paths.dashboard.authors.details.view,
+        icon: ICONS.user,
+        requiresAuthor: true,
       },
     ],
   },
