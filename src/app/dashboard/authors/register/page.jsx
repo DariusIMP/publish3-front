@@ -63,26 +63,11 @@ export default function AuthorRegisterPage() {
         throw new Error('User not authenticated. Please sign in.');
       }
 
-      // Create Movement embedded wallet for the author
-      let walletAddress;
-      try {
-        const result = await createWallet({ chainType: 'movement' });
-        if (!result.wallet) {
-          throw new Error('Failed to create wallet: No wallet returned');
-        }
-        walletAddress = result.wallet.address;
-        console.log('Created Movement embedded wallet:', walletAddress);
-      } catch (walletError) {
-        console.error('Failed to create Movement wallet:', walletError);
-        throw new Error(`Failed to create payment wallet: ${walletError.message}`);
-      }
-
       const authorData = {
         privy_id: privyUser.id,
         name: data.name,
         email: data.email,
         affiliation: data.affiliation,
-        wallet_address: walletAddress,
       };
 
       console.log('Creating author with data:', authorData);

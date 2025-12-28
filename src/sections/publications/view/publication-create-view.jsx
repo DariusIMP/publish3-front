@@ -25,6 +25,7 @@ import { Form, Field } from 'src/components/hook-form';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { SimplePdfView } from 'src/sections/pdf/view/simple-pdf-view';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -275,31 +276,9 @@ export function PublicationCreateView() {
         },
       });
 
-      console.info('Publication created successfully:', response.data);
+      console.info('Publication created successfully:', backendResponse.data);
 
-      // After creating the publication, prepare blockchain transaction
-      const publicationId = response.data.id;
-      
-      // TODO: Uncomment this when blockchain integration is fully ready
-      // // Call the blockchain preparation endpoint
-      // try {
-      //   const blockchainResponse = await axiosInstance.get(
-      //     `${endpoints.publications.prepareBlockchainPublish(publicationId)}?price=${data.price}&citation_royalty_bps=${data.citationRoyaltyBps}`
-      //   );
-      //   console.info('Blockchain transaction prepared:', blockchainResponse.data);
-      //   alert('Publication created successfully! Blockchain transaction prepared.');
-      // } catch (blockchainError) {
-      //   console.error('Failed to prepare blockchain transaction:', blockchainError);
-      //   // Still show success for publication creation
-      //   alert('Publication created successfully! Blockchain transaction preparation failed. You can try again later.');
-      // }
-
-      // For now, just show success for publication creation
-      alert('Publication created successfully! Blockchain integration will be available soon.');
-
-      // Redirect to publications list
       router.push(paths.dashboard.publications.list);
-
     } catch (error) {
       console.error('Failed to create publication:', error);
       alert(`Failed to create publication: ${error.message}`);
