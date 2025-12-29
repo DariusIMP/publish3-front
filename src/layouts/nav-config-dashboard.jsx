@@ -59,9 +59,9 @@ export const navData = [
       },
       {
         title: 'My Purchased Papers',
-        path: paths.dashboard.publications.list, // TODO: Create purchased papers page
+        path: paths.dashboard.purchasedPapers.list,
         icon: ICONS.file,
-        description: 'View papers you have purchased (Coming Soon)',
+        description: 'View papers you have purchased',
       },
       {
         title: 'Citations',

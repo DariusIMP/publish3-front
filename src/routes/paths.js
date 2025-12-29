@@ -51,5 +51,9 @@ export const paths = {
     wallet: {
       view: `${ROOTS.DASHBOARD}/wallet`,
     },
+    // Purchased Papers
+    purchasedPapers: {
+      list: `${ROOTS.DASHBOARD}/purchased-papers`,
+    },
   },
 };

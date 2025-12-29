@@ -74,6 +74,7 @@ export const endpoints = {
     getCitedBy: (publicationId) => `/publications/${publicationId}/cited-by`,
     getPdfUrl: (publicationId) => `/publications/${publicationId}/pdf-url`,
     prepareBlockchainPublish: (publicationId) => `/publications/${publicationId}/prepare-blockchain-publish`,
+    purchase: (publicationId) => `/publications/${publicationId}/purchase`,
   },
 
   // Citations
@@ -104,6 +105,11 @@ export const endpoints = {
     update: (id) => `/users/${id}`,
     delete: (id) => `/users/${id}`,
     getWallet: (id) => `/users/${id}/wallet`,
+  },
+
+  // Purchases
+  purchases: {
+    listByUser: (userId) => `/purchases/user/${userId}`,
   },
 
   // Publication Authors (junction table)

@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react';
 
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
+import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+
+import { usePrivy } from '@privy-io/react-auth';
 
 import { getPublication } from 'src/actions/publications/action';
 
@@ -21,14 +25,24 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 import { useRouter } from 'src/routes/hooks';
 
+import { useAuthContext } from 'src/auth/hooks';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
 import { fDate } from 'src/utils/format-time';
 
 // ----------------------------------------------------------------------
 
 export function PublicationPreviewView({ id }) {
   const router = useRouter();
+  const { user: authUser } = useAuthContext();
+  const { user: privyUser } = usePrivy();
+  
   const [publication, setPublication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState(false);
+  const [purchaseError, setPurchaseError] = useState(null);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     async function loadPublication() {
@@ -49,6 +63,59 @@ export function PublicationPreviewView({ id }) {
       loadPublication();
     }
   }, [id, router]);
+
+  const handlePurchase = async () => {
+    if (!privyUser?.id) {
+      setSnackbar({
+        open: true,
+        message: 'Please sign in to purchase publications',
+        severity: 'error',
+      });
+      return;
+    }
+
+    setPurchasing(true);
+    setPurchaseError(null);
+    setPurchaseSuccess(false);
+
+    try {
+      const response = await axiosInstance.post(endpoints.publications.purchase(id));
+      
+      setPurchaseSuccess(true);
+      setSnackbar({
+        open: true,
+        message: 'Publication purchased successfully! You can now access the full paper.',
+        severity: 'success',
+      });
+
+      setTimeout(() => {
+        router.push(paths.dashboard.publications.read(id));
+      }, 2000);
+
+    } catch (error) {
+      console.error('Failed to purchase publication:', error);
+      
+      let errorMessage = 'Failed to purchase publication';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setPurchaseError(errorMessage);
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: 'error',
+      });
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   if (loading) {
     return (
@@ -222,12 +289,10 @@ export function PublicationPreviewView({ id }) {
                   size="large"
                   startIcon={<Iconify icon="solar:cart-bold" />}
                   sx={{ minWidth: 200 }}
-                  onClick={() => {
-                    // TODO: Implement actual purchase functionality
-                    router.push(paths.dashboard.publications.read(id));
-                  }}
+                  onClick={handlePurchase}
+                  disabled={purchasing}
                 >
-                  Purchase Paper
+                  {purchasing ? 'Processing Purchase...' : 'Purchase Paper'}
                 </Button>
 
                 <Button
@@ -253,6 +318,17 @@ export function PublicationPreviewView({ id }) {
           </Typography>
         </Box>
       </Container>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </DashboardContent>
   );
 }
