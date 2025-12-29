@@ -58,7 +58,7 @@ export function PublicationReadView() {
       try {
         setLoading(true);
         setPdfError(null);
-
+        
         const data = await getPublication(publicationId);
         setPublication(data);
 
@@ -75,7 +75,7 @@ export function PublicationReadView() {
               purchase => purchase.publication_id === publicationId
             );
             setHasPurchased(hasPurchasedPublication);
-
+            
             // If user has purchased or is author, fetch PDF URL
             if (hasPurchasedPublication || userIsAuthor) {
               await fetchPdfUrl();
@@ -87,6 +87,15 @@ export function PublicationReadView() {
         }
       } catch (err) {
         console.error('Error loading publication:', err);
+        
+        // Check if error is 401 (Unauthorized) or 403 (Forbidden)
+        const status = err.response?.status;
+        if (status === 401 || status === 403) {
+          // Redirect to preview view
+          router.push(paths.dashboard.publications.details(publicationId));
+          return;
+        }
+        
         setError('Failed to load publication');
       } finally {
         setLoading(false);
@@ -95,7 +104,7 @@ export function PublicationReadView() {
 
     async function fetchPdfUrl() {
       if (!publicationId) return;
-
+      
       try {
         setPdfLoading(true);
         setPdfError(null);
@@ -103,6 +112,15 @@ export function PublicationReadView() {
         setPdfUrl(pdfUrlResponse.pdf_url);
       } catch (pdfErr) {
         console.error('Error fetching PDF URL:', pdfErr);
+        
+        // Check if error is 401 (Unauthorized) or 403 (Forbidden)
+        const status = pdfErr.response?.status;
+        if (status === 401 || status === 403) {
+          // Redirect to preview view
+          router.push(paths.dashboard.publications.details(publicationId));
+          return;
+        }
+        
         setPdfError(pdfErr.response?.data?.message || 'Failed to load PDF');
       } finally {
         setPdfLoading(false);
@@ -110,7 +128,7 @@ export function PublicationReadView() {
     }
 
     loadPublication();
-  }, [publicationId, privyUser?.id]);
+  }, [publicationId, privyUser?.id, router]);
 
   const handleBack = () => {
     router.push(paths.dashboard.publications.details(publicationId));
