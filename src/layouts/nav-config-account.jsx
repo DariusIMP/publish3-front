@@ -1,4 +1,5 @@
 import { Iconify } from 'src/components/iconify';
+import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -7,6 +8,11 @@ export const _account = [
     label: 'Home',
     href: '/',
     icon: <Iconify icon="solar:home-angle-bold-duotone" />,
+  },
+  {
+    label: 'My Wallet',
+    href: paths.dashboard.wallet.view,
+    icon: <Iconify icon="solar:wallet-bold-duotone" />,
   },
   {
     label: 'Profile',

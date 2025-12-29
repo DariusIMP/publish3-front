@@ -16,7 +16,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 // Constants for Movement RPC
 const MOVEMENT_RPC_URL = 'https://testnet.movementnetwork.xyz';
 const APTOS_COIN_TYPE = '0x1::aptos_coin::AptosCoin';
-const OCTAS_PER_MOVE = 100000000; // 10^8 octas per Move
+const MOVE_TO_OCTAS_FACTOR = 100_000_000;
 
 // Function to fetch Move balance from Movement testnet
 async function fetchMoveBalance(walletAddress) {
@@ -27,7 +27,7 @@ async function fetchMoveBalance(walletAddress) {
   try {
     // Ensure wallet address has 0x prefix
     const formattedAddress = walletAddress.startsWith('0x') ? walletAddress : `0x${walletAddress}`;
-    
+
     const response = await fetch(
       `${MOVEMENT_RPC_URL}/v1/accounts/${formattedAddress}/balance/${APTOS_COIN_TYPE}`,
       {
@@ -36,7 +36,7 @@ async function fetchMoveBalance(walletAddress) {
         }
       }
     );
-    
+
     if (!response.ok) {
       // Handle 404 (wallet exists but has 0 balance) vs other errors
       if (response.status === 404) {
@@ -44,10 +44,10 @@ async function fetchMoveBalance(walletAddress) {
       }
       throw new Error(`Movement RPC error: ${response.status}`);
     }
-    
-    // The endpoint returns just an integer as JSON
+
+    // The endpoint returns octas (10^8 octas = 1 MOVE)
     const octas = await response.json();
-    return parseInt(octas) / OCTAS_PER_MOVE; // Convert to Move
+    return parseInt(octas);
   } catch (error) {
     console.error('Failed to fetch Move balance:', error);
     return 0; // Fallback to 0 on error
@@ -56,9 +56,15 @@ async function fetchMoveBalance(walletAddress) {
 
 // ----------------------------------------------------------------------
 
-export default function WalletComponent({ walletAddress, collectedMoney = 0, registrationDate }) {
+export default function WalletComponent({
+  walletAddress,
+  collectedMoney = 0,
+  registrationDate,
+  showFundButton = false
+}) {
   const [moveBalance, setMoveBalance] = useState(0);
   const [balanceLoading, setBalanceLoading] = useState(false);
+  const [funding, setFunding] = useState(false);
   const [balanceError, setBalanceError] = useState(null);
 
   // Fetch balance when wallet address changes
@@ -78,7 +84,7 @@ export default function WalletComponent({ walletAddress, collectedMoney = 0, reg
 
     try {
       const balance = await fetchMoveBalance(walletAddress);
-      setMoveBalance(balance);
+      setMoveBalance(balance / MOVE_TO_OCTAS_FACTOR);
     } catch (error) {
       console.error('Error loading balance:', error);
       setBalanceError('Failed to load balance');
@@ -90,6 +96,51 @@ export default function WalletComponent({ walletAddress, collectedMoney = 0, reg
 
   const handleRefresh = () => {
     loadBalance();
+  };
+
+  const formatMoveBalance = (balance) => {
+    // Format with up to 8 decimal places, remove trailing zeros
+    const formatted = balance.toFixed(8);
+    // Remove trailing zeros and the decimal point if all zeros after it
+    return formatted.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.$/, '');
+  };
+
+  const handleFundWallet = async () => {
+    if (!walletAddress) return;
+
+    setFunding(true);
+    try {
+      // Ensure wallet address has 0x prefix
+      const formattedAddress = walletAddress.startsWith('0x') ? walletAddress : `0x${walletAddress}`;
+
+      const response = await fetch('https://faucet.testnet.movementnetwork.xyz/fund', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          address: formattedAddress,
+          amount: 10 * MOVE_TO_OCTAS_FACTOR,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Faucet error: ${response.status} - ${errorText}`);
+      }
+
+      // Wait a moment for the transaction to be processed
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      // Refresh balance after funding
+      await loadBalance();
+
+    } catch (error) {
+      console.error('Failed to fund wallet:', error);
+      setBalanceError(`Failed to fund wallet: ${error.message}`);
+    } finally {
+      setFunding(false);
+    }
   };
 
   return (
@@ -137,10 +188,10 @@ export default function WalletComponent({ walletAddress, collectedMoney = 0, reg
           ) : (
             <>
               <Typography variant="h6" sx={{ mt: 0.5 }}>
-                {moveBalance.toFixed(4)} Move
+                {formatMoveBalance(moveBalance)} Move
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Live balance from Movement testnet
+                Live balance from Movement testnet (1 Move = 100,000,000 octas)
               </Typography>
             </>
           )}
@@ -166,6 +217,24 @@ export default function WalletComponent({ walletAddress, collectedMoney = 0, reg
             {registrationDate ? new Date(registrationDate).toLocaleDateString() : 'Unknown'}
           </Typography>
         </Box>
+
+        {showFundButton && walletAddress && (
+          <Box sx={{ mt: 3, pt: 2, borderTop: '1px dashed', borderColor: 'divider' }}>
+            <Button
+              variant="contained"
+              fullWidth
+              size="medium"
+              onClick={handleFundWallet}
+              disabled={funding || balanceLoading}
+              startIcon={funding ? <CircularProgress size={20} color="inherit" /> : null}
+            >
+              {funding ? 'Funding...' : 'Fund Wallet with Faucet (10 Move)'}
+            </Button>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              Use the Movement testnet faucet to get 10 Move tokens for testing
+            </Typography>
+          </Box>
+        )}
       </CardContent>
     </Card>
   );

@@ -276,9 +276,10 @@ export function PublicationCreateView() {
         },
       });
 
-      console.info('Publication created successfully:', backendResponse.data);
+      console.info('Publication created successfully:', response.data);
 
-      router.push(paths.dashboard.publications.list);
+      const publicationId = response.data.id;
+      router.push(paths.dashboard.publications.read(publicationId));
     } catch (error) {
       console.error('Failed to create publication:', error);
       alert(`Failed to create publication: ${error.message}`);

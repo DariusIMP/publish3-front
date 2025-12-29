@@ -103,6 +103,7 @@ export const endpoints = {
     list: '/users/list',
     update: (id) => `/users/${id}`,
     delete: (id) => `/users/${id}`,
+    getWallet: (id) => `/users/${id}/wallet`,
   },
 
   // Publication Authors (junction table)
