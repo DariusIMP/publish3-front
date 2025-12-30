@@ -6,9 +6,12 @@ import { usePrivy } from '@privy-io/react-auth';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -16,6 +19,7 @@ import { useRouter } from 'src/routes/hooks';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import WalletComponent from 'src/components/wallet/wallet-component';
+import TransactionComponent from 'src/components/transaction/transaction-component';
 
 import { useAuthContext } from 'src/auth/hooks';
 import axiosInstance, { endpoints } from 'src/lib/axios';
@@ -30,6 +34,9 @@ export default function WalletPage() {
   const [loading, setLoading] = useState(true);
   const [walletAddress, setWalletAddress] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [purchases, setPurchases] = useState([]);
+  const [publications, setPublications] = useState([]);
+  const [activeTab, setActiveTab] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
@@ -58,6 +65,22 @@ export default function WalletPage() {
           console.error('Failed to fetch user data:', err);
         }
 
+        // Fetch user purchases
+        try {
+          const purchasesResponse = await axiosInstance.get(endpoints.purchases.listByUser(privyUser.id));
+          setPurchases(purchasesResponse.data?.purchases || []);
+        } catch (err) {
+          console.error('Failed to fetch purchases:', err);
+        }
+
+        // Fetch user publications
+        try {
+          const publicationsResponse = await axiosInstance.get(endpoints.publications.listByUser(privyUser.id));
+          setPublications(publicationsResponse.data?.publications || []);
+        } catch (err) {
+          console.error('Failed to fetch publications:', err);
+        }
+
       } catch (err) {
         console.error('Failed to fetch wallet data:', err);
         showSnackbar('Failed to load wallet data', 'error');
@@ -76,6 +99,34 @@ export default function WalletPage() {
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  const handleViewPublication = (publicationId) => {
+    router.push(paths.dashboard.publications.details(publicationId));
+  };
+
+  // Filter publications that have transaction hashes
+  const publicationsWithTransactions = publications.filter(
+    pub => pub.transaction_hash && pub.status === 'PUBLISHED'
+  );
+
+  // Combine purchases and publications for all transactions view
+  const allTransactions = [
+    ...purchases.map(purchase => ({
+      ...purchase,
+      type: 'purchase',
+      publication: publications.find(pub => pub.id === purchase.publication_id)
+    })),
+    ...publicationsWithTransactions.map(publication => ({
+      ...publication,
+      type: 'publication',
+      transaction_hash: publication.transaction_hash,
+      status: publication.status
+    }))
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   if (loading) {
     return (
@@ -101,13 +152,131 @@ export default function WalletPage() {
           sx={{ mb: { xs: 3, md: 5 } }}
         />
 
-        {/* Wallet Component with fund button enabled */}
-        <WalletComponent
-          walletAddress={walletAddress}
-          collectedMoney={userData?.collected_money || 0}
-          registrationDate={userData?.created_at || author?.created_at}
-          showFundButton={true}
-        />
+        <Grid container spacing={3}>
+          {/* Wallet Component */}
+          <Grid item xs={12} md={4}>
+            <WalletComponent
+              walletAddress={walletAddress}
+              collectedMoney={userData?.collected_money || 0}
+              registrationDate={userData?.created_at || author?.created_at}
+              showFundButton={true}
+            />
+          </Grid>
+
+          {/* Transactions Section */}
+          <Grid item xs={12} md={8}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h5" sx={{ mb: 2 }}>
+                Transaction History
+              </Typography>
+              
+              <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
+                <Tab label={`All (${allTransactions.length})`} />
+                <Tab label={`Purchases (${purchases.length})`} />
+                <Tab label={`Publications (${publicationsWithTransactions.length})`} />
+              </Tabs>
+
+              {activeTab === 0 && (
+                <Grid container spacing={2}>
+                  {allTransactions.length > 0 ? (
+                    allTransactions.map((transaction, index) => (
+                      <Grid item xs={12} key={index}>
+                        <TransactionComponent
+                          transaction={transaction}
+                          publication={transaction.publication}
+                          type={transaction.type}
+                          onViewPublication={
+                            transaction.publication_id || transaction.id
+                              ? () => handleViewPublication(transaction.publication_id || transaction.id)
+                              : undefined
+                          }
+                        />
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid item xs={12}>
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          No transactions found
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          Your transaction history will appear here
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              )}
+
+              {activeTab === 1 && (
+                <Grid container spacing={2}>
+                  {purchases.length > 0 ? (
+                    purchases.map((purchase, index) => {
+                      const publication = publications.find(pub => pub.id === purchase.publication_id);
+                      return (
+                        <Grid item xs={12} key={index}>
+                          <TransactionComponent
+                            transaction={purchase}
+                            publication={publication}
+                            type="purchase"
+                            onViewPublication={
+                              publication
+                                ? () => handleViewPublication(publication.id)
+                                : undefined
+                            }
+                          />
+                        </Grid>
+                      );
+                    })
+                  ) : (
+                    <Grid item xs={12}>
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          No purchases found
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          Purchase publications to see them here
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              )}
+
+              {activeTab === 2 && (
+                <Grid container spacing={2}>
+                  {publicationsWithTransactions.length > 0 ? (
+                    publicationsWithTransactions.map((publication, index) => (
+                      <Grid item xs={12} key={index}>
+                        <TransactionComponent
+                          transaction={{
+                            transaction_hash: publication.transaction_hash,
+                            created_at: publication.created_at,
+                            status: publication.status,
+                          }}
+                          publication={publication}
+                          type="publication"
+                          onViewPublication={() => handleViewPublication(publication.id)}
+                        />
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid item xs={12}>
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant="body1" color="text.secondary">
+                          No published publications found
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          Publish papers to see them here
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              )}
+            </Box>
+          </Grid>
+        </Grid>
       </Container>
 
       <Snackbar
