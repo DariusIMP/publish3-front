@@ -14,6 +14,7 @@ import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/component
 
 import { AuthProvider } from 'src/auth/context/privy';
 import { MovementProvider } from 'src/context/movement';
+import { WalletProvider } from 'src/context/wallet-context';
 
 // ----------------------------------------------------------------------
 
@@ -64,23 +65,25 @@ export default async function RootLayout({ children }) {
 
         <MovementProvider>
           <AuthProvider>
-            <SettingsProvider
-              cookieSettings={appConfig.cookieSettings}
-              defaultSettings={defaultSettings}
-            >
-              <AppRouterCacheProvider options={{ key: 'css' }}>
-                <ThemeProvider
-                  modeStorageKey={themeConfig.modeStorageKey}
-                  defaultMode={themeConfig.defaultMode}
-                >
-                  <MotionLazy>
-                    <ProgressBar />
-                    <SettingsDrawer defaultSettings={defaultSettings} />
-                    {children}
-                  </MotionLazy>
-                </ThemeProvider>
-              </AppRouterCacheProvider>
-            </SettingsProvider>
+            <WalletProvider>
+              <SettingsProvider
+                cookieSettings={appConfig.cookieSettings}
+                defaultSettings={defaultSettings}
+              >
+                <AppRouterCacheProvider options={{ key: 'css' }}>
+                  <ThemeProvider
+                    modeStorageKey={themeConfig.modeStorageKey}
+                    defaultMode={themeConfig.defaultMode}
+                  >
+                    <MotionLazy>
+                      <ProgressBar />
+                      <SettingsDrawer defaultSettings={defaultSettings} />
+                      {children}
+                    </MotionLazy>
+                  </ThemeProvider>
+                </AppRouterCacheProvider>
+              </SettingsProvider>
+            </WalletProvider>
           </AuthProvider>
         </MovementProvider>
       </body>
