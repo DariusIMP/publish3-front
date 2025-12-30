@@ -1,11 +1,41 @@
-import { CONFIG } from 'src/global-config';
+'use client';
 
-import { BlankView } from 'src/sections/blank/view';
+import { useState, useEffect } from 'react';
+
+import { getAuthorsList } from 'src/actions/authors';
+import { DashboardContent } from 'src/layouts/dashboard';
+import { AuthorCardsView } from 'src/sections/authors/view/author-cards-view';
 
 // ----------------------------------------------------------------------
 
-export const metadata = { title: `Authors | Dashboard - ${CONFIG.appName}` };
-
 export default function Page() {
-  return <BlankView title="Authors Management" description="This page will display a list of all authors. Feature coming soon!" />;
+  const [authors, setAuthors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      try {
+        setLoading(true);
+        // Fetch authors from backend - now includes publications_count
+        // getAuthorsList() returns the authors array directly
+        const authorsData = await getAuthorsList();
+        
+        setAuthors(authorsData);
+      } catch (err) {
+        setError('Failed to load authors');
+        console.error('Error fetching authors:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAuthors();
+  }, []);
+
+  return (
+    <DashboardContent>
+      <AuthorCardsView authors={authors} loading={loading} error={error} />
+    </DashboardContent>
+  );
 }
