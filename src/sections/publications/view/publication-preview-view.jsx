@@ -36,13 +36,15 @@ export function PublicationPreviewView({ id }) {
   const router = useRouter();
   const { user: authUser } = useAuthContext();
   const { user: privyUser } = usePrivy();
-  
+
   const [publication, setPublication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [purchaseError, setPurchaseError] = useState(null);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [hasAccess, setHasAccess] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
 
   useEffect(() => {
     async function loadPublication() {
@@ -64,6 +66,27 @@ export function PublicationPreviewView({ id }) {
     }
   }, [id, router]);
 
+  // Check if user has access to the publication using backend endpoint
+  useEffect(() => {
+    async function checkAccess() {
+      try {
+        const response = await axiosInstance.get(endpoints.publications.checkAccess(id));
+        const accessData = response.data;
+
+        setHasAccess(accessData.has_access);
+      } catch (error) {
+        console.error('Error checking access:', error);
+        // If there's an error (e.g., user not authenticated), assume no access
+        setHasAccess(false);
+      } finally {
+        setCheckingAccess(false);
+      }
+    }
+
+    checkAccess();
+  }, [publication, authUser?.privyId, id]);
+
+
   const handlePurchase = async () => {
     if (!privyUser?.id) {
       setSnackbar({
@@ -80,7 +103,7 @@ export function PublicationPreviewView({ id }) {
 
     try {
       const response = await axiosInstance.post(endpoints.publications.purchase(id));
-      
+
       setPurchaseSuccess(true);
       setSnackbar({
         open: true,
@@ -94,14 +117,14 @@ export function PublicationPreviewView({ id }) {
 
     } catch (error) {
       console.error('Failed to purchase publication:', error);
-      
+
       let errorMessage = 'Failed to purchase publication';
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       setPurchaseError(errorMessage);
       setSnackbar({
         open: true,
@@ -274,40 +297,79 @@ export function PublicationPreviewView({ id }) {
 
             <Divider />
 
-            {/* Purchase Section */}
+            {/* Access Section */}
             <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="h5" gutterBottom>
-                Access Full Publication
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
-                Purchase this publication to get full access to the complete paper, including all figures, data, and references.
-              </Typography>
+              {checkingAccess ? (
+                <Typography variant="body1" color="text.secondary">
+                  Checking access...
+                </Typography>
+              ) : hasAccess ? (
+                <>
+                  <Typography variant="h5" gutterBottom>
+                    Access Granted
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+                    You have access to this publication. You can read the full paper now.
+                  </Typography>
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<Iconify icon="solar:cart-bold" />}
-                  sx={{ minWidth: 200 }}
-                  onClick={handlePurchase}
-                  disabled={purchasing}
-                >
-                  {purchasing ? 'Processing Purchase...' : 'Purchase Paper'}
-                </Button>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+                    <Button
+                      variant="contained"
+                      size="large"
+                      startIcon={<Iconify icon="solar:document-bold" />}
+                      sx={{ minWidth: 200 }}
+                      component={RouterLink}
+                      href={paths.dashboard.publications.read(id)}
+                    >
+                      Read Paper
+                    </Button>
 
-                <Button
-                  variant="outlined"
-                  size="large"
-                  component={RouterLink}
-                  href={paths.dashboard.publications.list}
-                >
-                  Back to Publications
-                </Button>
-              </Stack>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      component={RouterLink}
+                      href={paths.dashboard.publications.list}
+                    >
+                      Back to Publications
+                    </Button>
+                  </Stack>
+                </>
+              ) : (
+                <>
+                  <Typography variant="h5" gutterBottom>
+                    Access Full Publication
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+                    Purchase this publication to get full access to the complete paper, including all figures, data, and references.
+                  </Typography>
 
-              <Typography variant="caption" color="text.disabled" sx={{ mt: 3, display: 'block' }}>
-                By purchasing, you agree to our terms of service and privacy policy.
-              </Typography>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+                    <Button
+                      variant="contained"
+                      size="large"
+                      startIcon={<Iconify icon="solar:cart-bold" />}
+                      sx={{ minWidth: 200 }}
+                      onClick={handlePurchase}
+                      disabled={purchasing}
+                    >
+                      {purchasing ? 'Processing Purchase...' : 'Purchase Paper'}
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      component={RouterLink}
+                      href={paths.dashboard.publications.list}
+                    >
+                      Back to Publications
+                    </Button>
+                  </Stack>
+
+                  <Typography variant="caption" color="text.disabled" sx={{ mt: 3, display: 'block' }}>
+                    By purchasing, you agree to our terms of service and privacy policy.
+                  </Typography>
+                </>
+              )}
             </Box>
           </Stack>
         </Card>

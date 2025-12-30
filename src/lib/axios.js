@@ -73,6 +73,7 @@ export const endpoints = {
     getCitations: (publicationId) => `/publications/${publicationId}/citations`,
     getCitedBy: (publicationId) => `/publications/${publicationId}/cited-by`,
     getPdfUrl: (publicationId) => `/publications/${publicationId}/pdf-url`,
+    checkAccess: (publicationId) => `/publications/${publicationId}/access`,
     prepareBlockchainPublish: (publicationId) => `/publications/${publicationId}/prepare-blockchain-publish`,
     purchase: (publicationId) => `/publications/${publicationId}/purchase`,
   },
