@@ -7,10 +7,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
@@ -18,7 +16,7 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 
 import { Iconify } from 'src/components/iconify';
-import { Label } from 'src/components/label';
+import { PurchaseCard } from 'src/components/purchase/purchase-card';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -86,30 +84,6 @@ export default function PurchasedPapersPage() {
     router.push(paths.dashboard.publications.read(publicationId));
   };
 
-  const getStatusColor = (status) => {
-    switch (status?.toUpperCase()) {
-      case 'PAID':
-      case 'SETTLED':
-        return 'success';
-      case 'PENDING':
-        return 'warning';
-      case 'FAILED':
-      case 'CANCELLED':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Unknown';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
   if (loading) {
     return (
       <DashboardContent>
@@ -164,60 +138,11 @@ export default function PurchasedPapersPage() {
             <Grid container spacing={3}>
               {purchases.map((purchase) => (
                 <Grid item xs={12} key={purchase.id}>
-                  <Card>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                        <Box>
-                          <Typography variant="h6" gutterBottom>
-                            Purchase #{purchase.id.slice(0, 8)}...
-                          </Typography>
-                          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                            <Chip
-                              label={purchase.status}
-                              size="small"
-                              color={getStatusColor(purchase.status)}
-                              variant="soft"
-                            />
-                            <Typography variant="caption" color="text.secondary">
-                              Purchased on {formatDate(purchase.created_at)}
-                            </Typography>
-                          </Stack>
-                        </Box>
-                        <Label color="info">Publication ID: {purchase.publication_id?.slice(0, 8)}...</Label>
-                      </Box>
-
-                      <Divider sx={{ my: 2 }} />
-
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Transaction: {purchase.transaction_hash ? `${purchase.transaction_hash.slice(0, 16)}...` : 'Not available'}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Last updated: {formatDate(purchase.updated_at)}
-                          </Typography>
-                        </Box>
-                        <Stack direction="row" spacing={1}>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => handleViewPublication(purchase.publication_id)}
-                            startIcon={<Iconify icon="solar:eye-bold-duotone" />}
-                          >
-                            View Details
-                          </Button>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            onClick={() => handleReadPublication(purchase.publication_id)}
-                            startIcon={<Iconify icon="solar:document-text-bold-duotone" />}
-                          >
-                            Read Paper
-                          </Button>
-                        </Stack>
-                      </Box>
-                    </CardContent>
-                  </Card>
+                  <PurchaseCard
+                    purchase={purchase}
+                    onViewPublication={handleViewPublication}
+                    onReadPublication={handleReadPublication}
+                  />
                 </Grid>
               ))}
             </Grid>
