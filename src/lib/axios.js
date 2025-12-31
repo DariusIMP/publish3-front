@@ -95,6 +95,7 @@ export const endpoints = {
     list: '/authors/list',
     update: (id) => `/authors/${id}`,
     delete: (id) => `/authors/${id}`,
+    getStats: (id) => `/authors/${id}/stats`,
   },
 
   // Users
