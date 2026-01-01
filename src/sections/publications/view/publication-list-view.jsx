@@ -10,13 +10,14 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 
 import { getPublicationsList } from 'src/actions/publications/action';
+import { useAuthContext } from 'src/auth/hooks';
 
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { Iconify } from 'src/components/iconify';
 import { Label } from 'src/components/label';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
+import { useRouter } from 'src/routes/hooks';
 
 import { PublicationSearch } from '../publication-search';
 import { PublicationSort } from '../publication-sort';
@@ -37,6 +38,8 @@ export function PublicationListView() {
   const [publications, setPublications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('latest');
+  const router = useRouter();
+  const { author } = useAuthContext();
 
   const { state, setState } = useSetState({ filter: 'all' });
 
@@ -76,10 +79,15 @@ export function PublicationListView() {
         ]}
         action={
           <Button
-            component={RouterLink}
-            href={paths.dashboard.publications.create}
             variant="contained"
             startIcon={<Iconify icon="mingcute:add-line" />}
+            onClick={() => {
+              if (!author) {
+                router.push(`${paths.dashboard.authors.register}?returnTo=${encodeURIComponent(paths.dashboard.publications.create)}`);
+              } else {
+                router.push(paths.dashboard.publications.create);
+              }
+            }}
           >
             New Publication
           </Button>

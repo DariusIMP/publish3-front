@@ -1,17 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePrivy } from '@privy-io/react-auth';
 import { useCreateWallet } from '@privy-io/react-auth/extended-chains';
+import { useSearchParams } from 'next/navigation';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
+
+import { toast } from 'src/components/snackbar';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -38,6 +40,7 @@ const AuthorRegisterSchema = zod.object({
 
 export default function AuthorRegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, updateAuthor } = useAuthContext();
   const { user: privyUser } = usePrivy();
   const { createWallet, isLoading: isCreatingWallet } = useCreateWallet();
@@ -79,16 +82,22 @@ export default function AuthorRegisterPage() {
       // Update AuthContext with the newly created author
       updateAuthor(response.data);
 
-      alert('Author registered successfully! Your Movement embedded wallet has been created for receiving payments.');
-
-      // Redirect to authors list after successful registration
-      router.push(paths.dashboard.authors.list);
+      toast.success('Registered as an author successfully!');
+      
+      // Determine where to redirect based on query param
+      const returnTo = searchParams.get('returnTo');
+      if (returnTo) {
+        router.push(returnTo);
+      } else {
+        // Default redirect to author details page
+        router.push(paths.dashboard.authors.details.view);
+      }
     } catch (error) {
       console.error('Failed to register author:', error);
 
       let errorMessage = error.message || 'Failed to register author';
 
-      alert(`Error: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
     }
   });
 

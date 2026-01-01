@@ -13,6 +13,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
+import { toast } from 'src/components/snackbar';
+
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
@@ -128,8 +130,9 @@ export default function AuthorEditPage() {
         updateAuthor(authorResponse.data);
       }
       
-      alert('Author information updated successfully!');
+      toast.success('Author information updated successfully!');
       
+      // Redirect immediately
       router.push(paths.dashboard.authors.details.view);
     } catch (err) {
       console.error('Failed to update author:', err);      

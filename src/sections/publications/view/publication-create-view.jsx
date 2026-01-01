@@ -12,8 +12,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Autocomplete from '@mui/material/Autocomplete';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+
+import { toast } from 'src/components/snackbar';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -153,15 +153,6 @@ export function PublicationCreateView() {
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [publications, setPublications] = useState([]);
   const [selectedCitations, setSelectedCitations] = useState([]);
-  const [error, setError] = useState(null);
-
-  const showError = (message) => {
-    setError(message);
-  };
-
-  const handleCloseError = () => {
-    setError(null);
-  };
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -213,7 +204,7 @@ export function PublicationCreateView() {
       setSelectedFile(file);
       fileIsLoaded.onTrue();
     } else {
-      showError('Please select a PDF file');
+      toast.error('Please select a PDF file');
     }
   }, [fileIsLoaded]);
 
@@ -241,14 +232,14 @@ export function PublicationCreateView() {
 
   const onSubmit = handleSubmit(async (data) => {
     if (!selectedFile) {
-      showError('Please select a PDF file to upload');
+      toast.error('Please select a PDF file to upload');
       return;
     }
 
     // Convert price from Move to octas (1 Move = 10^8 octas)
     const priceInOctas = Math.round(data.price * 10 ** 8);
     if (priceInOctas < 0) {
-      showError('Price must be non-negative');
+      toast.error('Price must be non-negative');
       return;
     }
 
@@ -297,7 +288,7 @@ export function PublicationCreateView() {
       router.push(paths.dashboard.publications.read(publicationId));
     } catch (error) {
       console.error('Failed to create publication:', error);
-      showError(`Failed to create publication: ${error.message}`);
+      toast.error(`Failed to create publication: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -522,16 +513,6 @@ export function PublicationCreateView() {
           </Box>
         </Box>
       </Form>
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={handleCloseError}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
-          {error}
-        </Alert>
-      </Snackbar>
     </DashboardContent>
   );
 }

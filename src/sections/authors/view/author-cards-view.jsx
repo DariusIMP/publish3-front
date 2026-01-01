@@ -18,12 +18,14 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/iconify';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { useAuthContext } from 'src/auth/hooks';
 
 import { AuthorCardList } from '../author-card-list';
 
 // ----------------------------------------------------------------------
 
 export function AuthorCardsView({ authors, loading, error }) {
+  const { author } = useAuthContext();
   const [sortBy, setSortBy] = useState('papers'); // 'papers', 'name', 'affiliation'
 
   // Sort authors based on selected criteria
@@ -65,14 +67,16 @@ export function AuthorCardsView({ authors, loading, error }) {
           { name: 'Authors', href: paths.dashboard.authors.list },
         ]}
         action={
-          <Button
-            component={RouterLink}
-            href={paths.dashboard.authors.register}
-            variant="contained"
-            startIcon={<Iconify icon="mingcute:add-line" />}
-          >
-            Register Author
-          </Button>
+          !author && (
+            <Button
+              component={RouterLink}
+              href={paths.dashboard.authors.register}
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+            >
+              Register Author
+            </Button>
+          )
         }
         sx={{ mb: { xs: 3, md: 5 } }}
       />
