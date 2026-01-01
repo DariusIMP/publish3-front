@@ -32,17 +32,31 @@ export function NavSectionVertical({
       {...other}
     >
       <NavUl sx={{ flex: '1 1 auto', gap: 'var(--nav-item-gap)' }}>
-        {data.map((group) => (
-          <Group
-            key={group.subheader ?? group.items[0].title}
-            subheader={group.subheader}
-            items={group.items}
-            render={render}
-            slotProps={slotProps}
-            checkPermissions={checkPermissions}
-            enabledRootRedirect={enabledRootRedirect}
-          />
-        ))}
+        {data.map((group) => {
+          // Check if group should be displayed
+          if (checkPermissions && !checkPermissions(group)) {
+            return null;
+          }
+          // Filter items within group
+          const filteredItems = group.items.filter(item => 
+            !checkPermissions || checkPermissions(item)
+          );
+          // If no items after filtering, skip rendering group
+          if (filteredItems.length === 0) {
+            return null;
+          }
+          return (
+            <Group
+              key={group.subheader ?? group.items[0].title}
+              subheader={group.subheader}
+              items={filteredItems}
+              render={render}
+              slotProps={slotProps}
+              checkPermissions={checkPermissions}
+              enabledRootRedirect={enabledRootRedirect}
+            />
+          );
+        })}
       </NavUl>
     </Nav>
   );
