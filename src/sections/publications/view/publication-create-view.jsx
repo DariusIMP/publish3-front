@@ -12,6 +12,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Autocomplete from '@mui/material/Autocomplete';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -152,6 +154,15 @@ export function PublicationCreateView() {
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [publications, setPublications] = useState([]);
   const [selectedCitations, setSelectedCitations] = useState([]);
+  const [error, setError] = useState(null);
+
+  const showError = (message) => {
+    setError(message);
+  };
+
+  const handleCloseError = () => {
+    setError(null);
+  };
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -204,7 +215,7 @@ export function PublicationCreateView() {
       setSelectedFile(file);
       fileIsLoaded.onTrue();
     } else {
-      alert('Please select a PDF file');
+      showError('Please select a PDF file');
     }
   }, [fileIsLoaded]);
 
@@ -232,7 +243,14 @@ export function PublicationCreateView() {
 
   const onSubmit = handleSubmit(async (data) => {
     if (!selectedFile) {
-      alert('Please select a PDF file to upload');
+      showError('Please select a PDF file to upload');
+      return;
+    }
+
+    // Convert price from Move to octas (1 Move = 10^8 octas)
+    const priceInOctas = Math.round(data.price * 10 ** 8);
+    if (priceInOctas < 0) {
+      showError('Price must be non-negative');
       return;
     }
 
@@ -253,8 +271,8 @@ export function PublicationCreateView() {
         formData.append('tags', data.tags);
       }
 
-      // Add blockchain fields
-      formData.append('price', data.price);
+      // Add blockchain fields (price in octas)
+      formData.append('price', priceInOctas);
       formData.append('citation_royalty_bps', data.citationRoyaltyBps);
 
       // Add authors as JSON array if any are selected
@@ -282,7 +300,7 @@ export function PublicationCreateView() {
       router.push(paths.dashboard.publications.read(publicationId));
     } catch (error) {
       console.error('Failed to create publication:', error);
-      alert(`Failed to create publication: ${error.message}`);
+      showError(`Failed to create publication: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -433,13 +451,13 @@ export function PublicationCreateView() {
             <Box sx={{ mt: 3 }}>
               <Field.Text
                 name="price"
-                label="Price (in smallest unit)"
+                label="Price (in Move)"
                 fullWidth
                 variant="outlined"
                 type="number"
-                placeholder="Enter price for purchasing this paper"
+                placeholder="Enter price in Move (1 Move = 100,000,000 octas)"
                 InputProps={{
-                  inputProps: { min: 0 }
+                  inputProps: { min: 0, step: "0.00000001" }
                 }}
               />
             </Box>
@@ -523,6 +541,16 @@ export function PublicationCreateView() {
           </Box>
         </Box>
       </Form>
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </DashboardContent>
   );
 }
