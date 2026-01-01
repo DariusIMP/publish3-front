@@ -62,6 +62,7 @@ export const endpoints = {
   // Publications
   publications: {
     create: '/publications/create',
+    simulate: '/publications/simulate',
     get: (id) => `/publications/${id}`,
     list: '/publications/list',
     update: (id) => `/publications/${id}`,
