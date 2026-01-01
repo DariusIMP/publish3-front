@@ -26,7 +26,7 @@ export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...
   const singleLogo = (
     <img
       alt="Single logo"
-      src={`${CONFIG.assetsDir}/logo/publish3-logo-single.png`}
+      src={`${CONFIG.assetsDir}/logo/publish3-single.svg`}
       width="100%"
       height="100%"
     />
@@ -35,7 +35,7 @@ export function Logo({ sx, disabled, className, href = '/', isSingle = true, ...
   const fullLogo = (
     <img
       alt="Full logo"
-      src={`${CONFIG.assetsDir}/logo/publish3-logo-full.png`}
+      src={`${CONFIG.assetsDir}/logo/publish3.svg`}
       width="100%"
       height="100%"
     />
