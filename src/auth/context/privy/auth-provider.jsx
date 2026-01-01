@@ -78,6 +78,9 @@ export function AuthProvider({ children }) {
   return (
     <PrivyProvider
       appId={CONFIG.privyAppId}
+      config={{
+        loginMethods: ['email', 'google', 'github', 'wallet'],
+      }}
     >
       <AuthProviderContent>
         {children}

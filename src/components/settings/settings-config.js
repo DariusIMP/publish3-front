@@ -6,12 +6,12 @@ import { themeConfig } from 'src/theme/theme-config';
 export const SETTINGS_STORAGE_KEY = 'app-settings';
 
 export const defaultSettings = {
-  mode: themeConfig.defaultMode,
+  mode: 'dark',
   direction: themeConfig.direction,
   contrast: 'default',
   navLayout: 'vertical',
-  primaryColor: 'default',
-  navColor: 'integrate',
+  primaryColor: 'preset4',
+  navColor: 'apparent',
   compactLayout: true,
   fontSize: 16,
   fontFamily: themeConfig.fontFamily.primary,

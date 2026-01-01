@@ -46,6 +46,7 @@ export const paths = {
         view: `${ROOTS.DASHBOARD}/authors/details`,
         edit: `${ROOTS.DASHBOARD}/authors/details/edit`,
       },
+      view: (id) => `${ROOTS.DASHBOARD}/authors/${id}`,
     },
     // Wallet
     wallet: {
