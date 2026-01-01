@@ -16,6 +16,8 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import { usePrivy } from '@privy-io/react-auth';
 
@@ -48,6 +50,7 @@ export function PublicationReadView() {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [hasPurchased, setHasPurchased] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
 
   const publicationId = params?.id;
 
@@ -136,12 +139,12 @@ export function PublicationReadView() {
 
   const handleDownload = () => {
     if (!pdfUrl) {
-      alert('PDF is not available for download. Please try again.');
+      showSnackbar('PDF is not available for download. Please try again.', 'error');
       return;
     }
 
     if (!isAuthor && !hasPurchased) {
-      alert('You need to purchase this publication to download the PDF.');
+      showSnackbar('You need to purchase this publication to download the PDF.', 'error');
       router.push(paths.dashboard.publications.details(publicationId));
       return;
     }
@@ -163,6 +166,14 @@ export function PublicationReadView() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const showSnackbar = (message, severity = 'error') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   if (loading) {
@@ -492,6 +503,16 @@ export function PublicationReadView() {
           </Box>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </DashboardContent>
   );
 }

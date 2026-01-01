@@ -48,7 +48,7 @@ export const navData = [
     subheader: 'Publications',
     items: [
       {
-        title: 'Browse Papers',
+        title: 'Browse',
         path: paths.dashboard.publications.list,
         icon: ICONS.folder,
       },
@@ -58,19 +58,14 @@ export const navData = [
         icon: ICONS.user,
       },
       {
-        title: 'My Purchased Papers',
+        title: 'My Purchases',
         path: paths.dashboard.purchasedPapers.list,
         icon: ICONS.file,
         description: 'View papers you have purchased',
       },
-      {
-        title: 'Citations',
-        path: paths.dashboard.citations.list,
-        icon: ICONS.label,
-      },
     ],
   },
-  
+
   /**
    * Author Dashboard - Only for Registered Authors
    */

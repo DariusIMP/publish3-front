@@ -38,7 +38,6 @@ const PublicationCreateSchema = zod.object({
   authors: zod.array(zod.any()).optional(),
   citations: zod.array(zod.any()).optional(),
   price: zod.number().min(0, { message: 'Price must be non-negative' }),
-  citationRoyaltyBps: zod.number().min(0).max(10000, { message: 'Citation royalty must be between 0 and 10000 basis points (0-100%)' }),
 });
 
 // ----------------------------------------------------------------------
@@ -174,7 +173,6 @@ export function PublicationCreateView() {
       authors: [],
       citations: [],
       price: 0,
-      citationRoyaltyBps: 0,
     },
   });
 
@@ -273,7 +271,6 @@ export function PublicationCreateView() {
 
       // Add blockchain fields (price in octas)
       formData.append('price', priceInOctas);
-      formData.append('citation_royalty_bps', data.citationRoyaltyBps);
 
       // Add authors as JSON array if any are selected
       if (selectedAuthors.length > 0) {
@@ -458,22 +455,6 @@ export function PublicationCreateView() {
                 placeholder="Enter price in Move (1 Move = 100,000,000 octas)"
                 InputProps={{
                   inputProps: { min: 0, step: "0.00000001" }
-                }}
-              />
-            </Box>
-
-            {/* Citation royalty field */}
-            <Box sx={{ mt: 3 }}>
-              <Field.Text
-                name="citationRoyaltyBps"
-                label="Citation Royalty (basis points, 100 = 1%)"
-                fullWidth
-                variant="outlined"
-                type="number"
-                placeholder="Enter citation royalty percentage in basis points"
-                helperText="Basis points: 100 = 1%, 1000 = 10%, 10000 = 100%"
-                InputProps={{
-                  inputProps: { min: 0, max: 10000 }
                 }}
               />
             </Box>
