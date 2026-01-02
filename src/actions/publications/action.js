@@ -14,6 +14,16 @@ export const getPublicationsList = async () => {
     }
 };
 
+export const getPublicationsCount = async () => {
+    try {
+        const response = await axiosInstance.get(endpoints.publications.count);
+        return response.data.total || 0;
+    } catch (error) {
+        console.error('Error during get publications count:', error);
+        throw error;
+    }
+};
+
 // ----------------------------------------------------------------------
 
 export const searchPublicationsByTitle = async (title) => {

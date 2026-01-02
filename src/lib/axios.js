@@ -65,6 +65,7 @@ export const endpoints = {
     simulate: '/publications/simulate',
     get: (id) => `/publications/${id}`,
     list: '/publications/list',
+    count: '/publications/count',
     update: (id) => `/publications/${id}`,
     delete: (id) => `/publications/${id}`,
     searchByTitle: '/publications/search/title',
@@ -105,6 +106,7 @@ export const endpoints = {
     create: '/users/create',
     get: (id) => `/users/${id}`,
     list: '/users/list',
+    count: '/users/count',
     update: (id) => `/users/${id}`,
     delete: (id) => `/users/${id}`,
     getWallet: (id) => `/users/${id}/wallet`,
@@ -113,6 +115,7 @@ export const endpoints = {
   // Purchases
   purchases: {
     listByUser: (userId) => `/purchases/user/${userId}`,
+    count: '/purchases/count',
   },
 
   // Publication Authors (junction table)

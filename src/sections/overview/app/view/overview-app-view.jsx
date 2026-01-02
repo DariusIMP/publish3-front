@@ -1,13 +1,15 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { SeoIllustration } from 'src/assets/illustrations';
-import { _appAuthors, _appRelated, _appFeatured, _appInvoices, _appInstalled } from 'src/_mock';
+import { _appAuthors, _appRelated, _appInvoices, _appInstalled } from 'src/_mock';
 
 import { svgColorClasses } from 'src/components/svg-color';
 
@@ -19,14 +21,51 @@ import { AppFeatured } from '../app-featured';
 import { AppTopAuthors } from '../app-top-authors';
 import { AppWidgetSummary } from '../app-widget-summary';
 import { CONFIG } from 'src/global-config';
-import { Typography } from '@mui/material';
+import { RouterLink } from 'src/routes/components';
+import { paths } from 'src/routes/paths';
+import { getPublicationsList, getPublicationsCount } from 'src/actions/publications/action';
+import { getUsersCount } from 'src/actions/users/action';
+import { getPurchasesCount } from 'src/actions/purchases/action';
 
 // ----------------------------------------------------------------------
 
 export function OverviewAppView() {
   const { user } = useMockedUser();
-
   const theme = useTheme();
+  const [featuredPublications, setFeaturedPublications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [usersCount, setUsersCount] = useState(0);
+  const [publicationsCount, setPublicationsCount] = useState(0);
+  const [purchasesCount, setPurchasesCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [publications, usersCount, purchasesCount, publicationsCount] = await Promise.all([
+          getPublicationsList(),
+          getUsersCount(),
+          getPurchasesCount(),
+          getPublicationsCount(),
+        ]);
+        // Take the first 4 publications (or fewer)
+        const featured = publications.slice(0, 4).map((pub) => ({
+          id: pub.id,
+          title: pub.title,
+          description: pub.about || 'No description available',
+          coverUrl: `${CONFIG.assetsDir}/assets/background/background-1.png`,
+        }));
+        setFeaturedPublications(featured);
+        setUsersCount(usersCount);
+        setPurchasesCount(purchasesCount);
+        setPublicationsCount(publicationsCount);
+      } catch (error) {
+        console.error('Failed to fetch data for dashboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
     <DashboardContent maxWidth="xl">
@@ -47,7 +86,12 @@ export function OverviewAppView() {
               />
             }
             action={
-              <Button variant="contained" color="primary">
+              <Button
+                variant="contained"
+                color="primary"
+                component={RouterLink}
+                href={paths.dashboard.publications.list}
+              >
                 Start browsing documents
               </Button>
             }
@@ -55,14 +99,14 @@ export function OverviewAppView() {
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <AppFeatured list={_appFeatured} />
+          <AppFeatured list={featuredPublications} />
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
           <AppWidgetSummary
             title="Total active users"
-            percent={2.6}
-            total={18765}
+            percent={5}
+            total={usersCount}
             chart={{
               categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
               series: [15, 18, 12, 51, 68, 11, 39, 37],
@@ -72,9 +116,9 @@ export function OverviewAppView() {
 
         <Grid size={{ xs: 12, md: 4 }}>
           <AppWidgetSummary
-            title="Total installed"
+            title="Total Publications"
             percent={0.2}
-            total={4876}
+            total={publicationsCount}
             chart={{
               colors: [theme.palette.info.main],
               categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
@@ -85,9 +129,9 @@ export function OverviewAppView() {
 
         <Grid size={{ xs: 12, md: 4 }}>
           <AppWidgetSummary
-            title="Total downloads"
+            title="Total purchases"
             percent={-0.1}
-            total={678}
+            total={purchasesCount}
             chart={{
               colors: [theme.palette.error.main],
               categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
