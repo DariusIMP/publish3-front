@@ -26,6 +26,7 @@ import { paths } from 'src/routes/paths';
 import { getPublicationsList, getPublicationsCount } from 'src/actions/publications/action';
 import { getUsersCount } from 'src/actions/users/action';
 import { getPurchasesCount } from 'src/actions/purchases/action';
+import { getTopAuthorsByPurchases } from 'src/actions/authors/action';
 
 // ----------------------------------------------------------------------
 
@@ -37,15 +38,17 @@ export function OverviewAppView() {
   const [usersCount, setUsersCount] = useState(0);
   const [publicationsCount, setPublicationsCount] = useState(0);
   const [purchasesCount, setPurchasesCount] = useState(0);
+  const [topAuthors, setTopAuthors] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [publications, usersCount, purchasesCount, publicationsCount] = await Promise.all([
+        const [publications, usersCount, purchasesCount, publicationsCount, topAuthorsData] = await Promise.all([
           getPublicationsList(),
           getUsersCount(),
           getPurchasesCount(),
           getPublicationsCount(),
+          getTopAuthorsByPurchases(3),
         ]);
         // Take the first 4 publications (or fewer)
         const featured = publications.slice(0, 4).map((pub) => ({
@@ -58,6 +61,14 @@ export function OverviewAppView() {
         setUsersCount(usersCount);
         setPurchasesCount(purchasesCount);
         setPublicationsCount(publicationsCount);
+        // Map top authors to expected format
+        const mappedAuthors = topAuthorsData.map((author, index) => ({
+          id: author.privy_id || `author-${index}`,
+          name: author.name,
+          avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name)}&background=random`,
+          totalFavorites: author.purchase_count || 0,
+        }));
+        setTopAuthors(mappedAuthors);
       } catch (error) {
         console.error('Failed to fetch data for dashboard:', error);
       } finally {
@@ -141,7 +152,7 @@ export function OverviewAppView() {
         </Grid>
 
         <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-          <AppTopAuthors title="Top authors" list={_appAuthors} />
+          <AppTopAuthors title="Top authors" list={topAuthors} />
         </Grid>
 
         <Grid size={{ xs: 12, md: 6, lg: 4 }}>

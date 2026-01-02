@@ -74,3 +74,17 @@ export const getAuthorDetails = async (privyId) => {
     throw error;
   }
 };
+
+// ----------------------------------------------------------------------
+
+export const getTopAuthorsByPurchases = async (limit) => {
+  try {
+    const response = await axiosInstance.get(endpoints.authors.topByPurchases, {
+      params: { limit }
+    });
+    return response.data || [];
+  } catch (error) {
+    console.error('Error during get top authors by purchases:', error);
+    throw error;
+  }
+};

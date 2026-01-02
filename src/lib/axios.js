@@ -95,6 +95,7 @@ export const endpoints = {
     create: '/authors/create',
     get: (id) => `/authors/${id}`,
     list: '/authors/list',
+    topByPurchases: '/authors/top-by-purchases',
     update: (id) => `/authors/${id}`,
     delete: (id) => `/authors/${id}`,
     getStats: (id) => `/authors/${id}/stats`,
