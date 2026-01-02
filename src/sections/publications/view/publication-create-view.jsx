@@ -275,12 +275,12 @@ export function PublicationCreateView() {
         formData.append('citations', JSON.stringify(citationIds));
       }
 
-      const simulate_response = await axiosInstance.post(endpoints.publications.simulate, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.info('Publication simulation:', simulate_response.data);
+      // const simulate_response = await axiosInstance.post(endpoints.publications.simulate, formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      // });
+      // console.info('Publication simulation:', simulate_response.data);
 
       // Send request with multipart/form-data
       const create_response = await axiosInstance.post(endpoints.publications.create, formData, {
@@ -289,7 +289,7 @@ export function PublicationCreateView() {
         },
       });
 
-      console.info('Publication created successfully:', create_response.data);
+      // console.info('Publication created successfully:', create_response.data);
 
       const publicationId = create_response.data.id;
       router.push(paths.dashboard.publications.read(publicationId));

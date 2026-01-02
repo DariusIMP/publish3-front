@@ -48,6 +48,11 @@ export const navData = [
     subheader: 'Publications',
     items: [
       {
+        title: 'Home',
+        path: paths.dashboard.root,
+        icon: ICONS.dashboard,
+      },
+      {
         title: 'Browse',
         path: paths.dashboard.publications.list,
         icon: ICONS.folder,
