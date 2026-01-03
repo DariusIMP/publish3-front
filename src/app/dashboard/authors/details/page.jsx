@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -17,7 +16,6 @@ import { useRouter } from 'src/routes/hooks';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { AnalyticsWidgetSummary } from 'src/components/analytics-widget-summary/analytics-widget-summary';
-import { Iconify } from 'src/components/iconify';
 
 import { useAuthContext } from 'src/auth/hooks';
 import axiosInstance, { endpoints } from 'src/lib/axios';
@@ -26,8 +24,7 @@ import axiosInstance, { endpoints } from 'src/lib/axios';
 
 export default function AuthorDetailsPage() {
   const router = useRouter();
-  const { updateAuthor } = useAuthContext();
-  const { user: privyUser } = usePrivy();
+  const { user, updateAuthor } = useAuthContext();
 
   const [loading, setLoading] = useState(true);
   const [authorData, setAuthorData] = useState(null);
@@ -39,7 +36,7 @@ export default function AuthorDetailsPage() {
 
   useEffect(() => {
     const fetchAuthorData = async () => {
-      if (!privyUser?.id) {
+      if (!user?.id) {
         setError('User not authenticated. Please sign in.');
         setLoading(false);
         return;
@@ -50,7 +47,7 @@ export default function AuthorDetailsPage() {
         setError(null);
 
         // Fetch author data
-        const response = await axiosInstance.get(endpoints.authors.get(privyUser.id));
+        const response = await axiosInstance.get(endpoints.authors.get(user.id));
         setAuthorData(response.data);
 
         // Update auth context with author data
@@ -59,10 +56,10 @@ export default function AuthorDetailsPage() {
         }
 
         // Fetch publications by this author
-        await fetchAuthorPublications(privyUser.id);
+        await fetchAuthorPublications(user.id);
 
         // Fetch author statistics
-        await fetchAuthorStats(privyUser.id);
+        await fetchAuthorStats(user.id);
 
       } catch (err) {
         console.error('Failed to fetch author data:', err);
@@ -73,7 +70,7 @@ export default function AuthorDetailsPage() {
     };
 
     fetchAuthorData();
-  }, [privyUser?.id, updateAuthor]);
+  }, [user?.id, user]);
 
   const fetchAuthorStats = async (authorId) => {
     try {

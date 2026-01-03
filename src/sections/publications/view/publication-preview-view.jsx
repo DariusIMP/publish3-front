@@ -34,8 +34,7 @@ import { fDate } from 'src/utils/format-time';
 
 export function PublicationPreviewView({ id }) {
   const router = useRouter();
-  const { user: authUser } = useAuthContext();
-  const { user: privyUser } = usePrivy();
+  const { user } = useAuthContext();
 
   const [publication, setPublication] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -84,11 +83,11 @@ export function PublicationPreviewView({ id }) {
     }
 
     checkAccess();
-  }, [publication, authUser?.privyId, id]);
+  }, [publication, user?.id, id]);
 
 
   const handlePurchase = async () => {
-    if (!privyUser?.id) {
+    if (!user?.id) {
       setSnackbar({
         open: true,
         message: 'Please sign in to purchase publications',

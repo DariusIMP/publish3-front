@@ -63,7 +63,7 @@ export function OverviewAppView() {
         setPublicationsCount(publicationsCount);
         // Map top authors to expected format
         const mappedAuthors = topAuthorsData.map((author, index) => ({
-          id: author.privy_id || `author-${index}`,
+          id: author.id || `author-${index}`,
           name: author.name,
           avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name)}&background=random`,
           totalFavorites: author.purchase_count || 0,

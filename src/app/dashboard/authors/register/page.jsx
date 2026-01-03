@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { usePrivy } from '@privy-io/react-auth';
 import { useCreateWallet } from '@privy-io/react-auth/extended-chains';
 import { useSearchParams } from 'next/navigation';
 
@@ -42,7 +40,6 @@ export default function AuthorRegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, updateAuthor } = useAuthContext();
-  const { user: privyUser } = usePrivy();
   const { createWallet, isLoading: isCreatingWallet } = useCreateWallet();
 
   const methods = useForm({
@@ -62,12 +59,12 @@ export default function AuthorRegisterPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      if (!privyUser?.id) {
+      if (!user?.id) {
         throw new Error('User not authenticated. Please sign in.');
       }
 
       const authorData = {
-        privy_id: privyUser.id,
+        id: user.id,
         name: data.name,
         email: data.email,
         affiliation: data.affiliation,
@@ -83,7 +80,7 @@ export default function AuthorRegisterPage() {
       updateAuthor(response.data);
 
       toast.success('Registered as an author successfully!');
-      
+
       // Determine where to redirect based on query param
       const returnTo = searchParams.get('returnTo');
       if (returnTo) {

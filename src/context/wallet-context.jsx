@@ -67,7 +67,7 @@ export function WalletProvider({ children }) {
 
   // Fetch wallet data when user changes
   useEffect(() => {
-    if (user?.privy_id) {
+    if (user?.id) {
       loadWalletData();
     } else {
       // Reset state when user logs out
@@ -76,7 +76,7 @@ export function WalletProvider({ children }) {
       setCollectedMoney(0);
       setError(null);
     }
-  }, [user?.privy_id]);
+  }, [user?.id]);
 
   // Load balance when wallet address changes
   useEffect(() => {
@@ -88,14 +88,14 @@ export function WalletProvider({ children }) {
   }, [walletAddress]);
 
   const loadWalletData = useCallback(async () => {
-    if (!user?.privy_id) return;
+    if (!user?.id) return;
 
     setLoading(true);
     setError(null);
 
     try {
       // Fetch wallet address
-      const walletResponse = await axiosInstance.get(endpoints.users.getWallet(user.privy_id));
+      const walletResponse = await axiosInstance.get(endpoints.users.getWallet(user.id));
       if (walletResponse.data?.wallet_address) {
         setWalletAddress(walletResponse.data.wallet_address);
       } else {
@@ -103,7 +103,7 @@ export function WalletProvider({ children }) {
       }
 
       // Fetch user data for collected money
-      const userResponse = await axiosInstance.get(endpoints.users.get(user.privy_id));
+      const userResponse = await axiosInstance.get(endpoints.users.get(user.id));
       setCollectedMoney(userResponse.data?.user?.collected_money || 0);
     } catch (err) {
       console.error('Failed to load wallet data:', err);
@@ -113,7 +113,7 @@ export function WalletProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [user?.privy_id]);
+  }, [user?.id]);
 
   const loadBalance = useCallback(async () => {
     if (!walletAddress) return;

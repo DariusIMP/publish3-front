@@ -20,7 +20,7 @@ export function AuthorCard({ author, sx, ...other }) {
   const router = useRouter();
 
   const handleViewDetails = () => {
-    router.push(paths.dashboard.authors.view(author.privy_id));
+    router.push(paths.dashboard.authors.view(author.id));
   };
 
   // Format date

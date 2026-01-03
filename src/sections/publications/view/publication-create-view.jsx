@@ -265,7 +265,7 @@ export function PublicationCreateView() {
 
       // Add authors as JSON array if any are selected
       if (selectedAuthors.length > 0) {
-        const authorIds = selectedAuthors.map(author => author.privy_id);
+        const authorIds = selectedAuthors.map(author => author.id);
         formData.append('authors', JSON.stringify(authorIds));
       }
 
@@ -415,7 +415,7 @@ export function PublicationCreateView() {
                 multiple
                 options={authors}
                 getOptionLabel={(option) => `${option.name}${option.email ? ` (${option.email})` : ''}`}
-                isOptionEqualToValue={(option, value) => option?.privy_id === value?.privy_id}
+                isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 value={selectedAuthors}
                 onChange={(event, value) => {
                   setSelectedAuthors(value);
@@ -431,7 +431,7 @@ export function PublicationCreateView() {
                   value.map((option, index) => (
                     <Chip
                       {...getTagProps({ index })}
-                      key={option.privy_id}
+                      key={option.id}
                       label={option.name}
                       size="small"
                       color="info"

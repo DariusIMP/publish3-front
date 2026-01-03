@@ -34,13 +34,14 @@ import { paths } from 'src/routes/paths';
 import axiosInstance, { endpoints } from 'src/lib/axios';
 
 import { SimplePdfView } from 'src/sections/pdf/view/simple-pdf-view';
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
 export function PublicationReadView() {
   const params = useParams();
   const router = useRouterHook();
-  const { user: privyUser } = usePrivy();
+  const { user } = useAuthContext();
 
   const [publication, setPublication] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,24 +62,24 @@ export function PublicationReadView() {
       try {
         setLoading(true);
         setPdfError(null);
-        
+
         const data = await getPublication(publicationId);
         setPublication(data);
 
         // Check if current user is the author
-        const userIsAuthor = data.user_id === privyUser?.id;
+        const userIsAuthor = data.user_id === user?.id;
         setIsAuthor(userIsAuthor);
 
         // Check if user has purchased this publication
-        if (privyUser?.id) {
+        if (user?.id) {
           try {
-            const response = await axiosInstance.get(endpoints.purchases.listByUser(privyUser.id));
+            const response = await axiosInstance.get(endpoints.purchases.listByUser(user.id));
             const userPurchases = response.data.purchases || [];
             const hasPurchasedPublication = userPurchases.some(
               purchase => purchase.publication_id === publicationId
             );
             setHasPurchased(hasPurchasedPublication);
-            
+
             // If user has purchased or is author, fetch PDF URL
             if (hasPurchasedPublication || userIsAuthor) {
               await fetchPdfUrl();
@@ -90,7 +91,7 @@ export function PublicationReadView() {
         }
       } catch (err) {
         console.error('Error loading publication:', err);
-        
+
         // Check if error is 401 (Unauthorized) or 403 (Forbidden)
         const status = err.response?.status;
         if (status === 401 || status === 403) {
@@ -98,7 +99,7 @@ export function PublicationReadView() {
           router.push(paths.dashboard.publications.details(publicationId));
           return;
         }
-        
+
         setError('Failed to load publication');
       } finally {
         setLoading(false);
@@ -107,7 +108,7 @@ export function PublicationReadView() {
 
     async function fetchPdfUrl() {
       if (!publicationId) return;
-      
+
       try {
         setPdfLoading(true);
         setPdfError(null);
@@ -115,7 +116,7 @@ export function PublicationReadView() {
         setPdfUrl(pdfUrlResponse.pdf_url);
       } catch (pdfErr) {
         console.error('Error fetching PDF URL:', pdfErr);
-        
+
         // Check if error is 401 (Unauthorized) or 403 (Forbidden)
         const status = pdfErr.response?.status;
         if (status === 401 || status === 403) {
@@ -123,7 +124,7 @@ export function PublicationReadView() {
           router.push(paths.dashboard.publications.details(publicationId));
           return;
         }
-        
+
         setPdfError(pdfErr.response?.data?.message || 'Failed to load PDF');
       } finally {
         setPdfLoading(false);
@@ -131,7 +132,7 @@ export function PublicationReadView() {
     }
 
     loadPublication();
-  }, [publicationId, privyUser?.id, router]);
+  }, [publicationId, user?.id, router]);
 
   const handleBack = () => {
     router.push(paths.dashboard.publications.details(publicationId));
@@ -151,14 +152,14 @@ export function PublicationReadView() {
 
     const link = document.createElement('a');
     link.href = pdfUrl;
-    
-    const fileName = publication?.title 
+
+    const fileName = publication?.title
       ? `${publication.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`
       : 'publication.pdf';
-    
+
     link.download = fileName;
     link.target = '_blank';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

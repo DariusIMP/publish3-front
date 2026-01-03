@@ -25,7 +25,7 @@ import axiosInstance, { endpoints } from 'src/lib/axios';
 export default function AuthorViewPage() {
   const router = useRouter();
   const params = useParams();
-  const authorId = params?.privy_id;
+  const authorId = params?.id;
 
   const [loading, setLoading] = useState(true);
   const [authorData, setAuthorData] = useState(null);
@@ -105,11 +105,6 @@ export default function AuthorViewPage() {
             <Typography color="error" variant="body1">
               {error}
             </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Button variant="contained" onClick={() => router.push(paths.dashboard.authors.list)}>
-                Back to Authors
-              </Button>
-            </Box>
           </Card>
         </Container>
       </DashboardContent>
@@ -179,15 +174,7 @@ export default function AuthorViewPage() {
                 Member since {new Date(authorData.created_at).toLocaleDateString()}
               </Typography>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-              <Button
-                variant="outlined"
-                startIcon={<Iconify icon="solar:arrow-left-bold" />}
-                onClick={() => router.push(paths.dashboard.authors.list)}
-              >
-                Back to Authors
-              </Button>
-            </Grid>
+
           </Grid>
         </Card>
 

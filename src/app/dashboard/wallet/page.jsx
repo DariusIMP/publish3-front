@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
 
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -29,7 +28,6 @@ import axiosInstance, { endpoints } from 'src/lib/axios';
 export default function WalletPage() {
   const router = useRouter();
   const { user: authUser, author } = useAuthContext();
-  const { user: privyUser } = usePrivy();
 
   const [loading, setLoading] = useState(true);
   const [walletAddress, setWalletAddress] = useState(null);
@@ -41,7 +39,7 @@ export default function WalletPage() {
 
   useEffect(() => {
     const fetchWalletData = async () => {
-      if (!privyUser?.id) {
+      if (!authUser?.id) {
         setLoading(false);
         return;
       }
@@ -50,7 +48,7 @@ export default function WalletPage() {
         setLoading(true);
 
         try {
-          const walletResponse = await axiosInstance.get(endpoints.users.getWallet(privyUser.id));
+          const walletResponse = await axiosInstance.get(endpoints.users.getWallet(authUser.id));
           if (walletResponse.data && walletResponse.data.wallet_address) {
             setWalletAddress(walletResponse.data.wallet_address);
           }
@@ -59,7 +57,7 @@ export default function WalletPage() {
         }
 
         try {
-          const userResponse = await axiosInstance.get(endpoints.users.get(privyUser.id));
+          const userResponse = await axiosInstance.get(endpoints.users.get(authUser.id));
           setUserData(userResponse.data?.user || userResponse.data);
         } catch (err) {
           console.error('Failed to fetch user data:', err);
@@ -67,7 +65,7 @@ export default function WalletPage() {
 
         // Fetch user purchases
         try {
-          const purchasesResponse = await axiosInstance.get(endpoints.purchases.listByUser(privyUser.id));
+          const purchasesResponse = await axiosInstance.get(endpoints.purchases.listByUser(authUser.id));
           setPurchases(purchasesResponse.data?.purchases || []);
         } catch (err) {
           console.error('Failed to fetch purchases:', err);
@@ -75,7 +73,7 @@ export default function WalletPage() {
 
         // Fetch user publications
         try {
-          const publicationsResponse = await axiosInstance.get(endpoints.publications.listByUser(privyUser.id));
+          const publicationsResponse = await axiosInstance.get(endpoints.publications.listByUser(authUser.id));
           setPublications(publicationsResponse.data?.publications || []);
         } catch (err) {
           console.error('Failed to fetch publications:', err);
@@ -90,7 +88,7 @@ export default function WalletPage() {
     };
 
     fetchWalletData();
-  }, [privyUser?.id]);
+  }, [authUser?.id]);
 
   const showSnackbar = (message, severity = 'success') => {
     setSnackbar({ open: true, message, severity });
@@ -169,7 +167,7 @@ export default function WalletPage() {
               <Typography variant="h5" sx={{ mb: 2 }}>
                 Transaction History
               </Typography>
-              
+
               <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
                 <Tab label={`All (${allTransactions.length})`} />
                 <Tab label={`Purchases (${purchases.length})`} />

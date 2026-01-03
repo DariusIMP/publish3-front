@@ -31,8 +31,7 @@ import axiosInstance, { endpoints } from 'src/lib/axios';
 
 export default function PurchasedPapersPage() {
   const router = useRouter();
-  const { user: authUser, author } = useAuthContext();
-  const { user: privyUser } = usePrivy();
+  const { user, author } = useAuthContext();
 
   const [loading, setLoading] = useState(true);
   const [purchases, setPurchases] = useState([]);
@@ -43,7 +42,7 @@ export default function PurchasedPapersPage() {
 
   useEffect(() => {
     const fetchPurchases = async () => {
-      if (!privyUser?.id) {
+      if (!user?.id) {
         setLoading(false);
         return;
       }
@@ -51,7 +50,7 @@ export default function PurchasedPapersPage() {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          endpoints.purchases.listByUser(privyUser.id),
+          endpoints.purchases.listByUser(user.id),
           { params: { page, limit } }
         );
 
@@ -66,7 +65,7 @@ export default function PurchasedPapersPage() {
     };
 
     fetchPurchases();
-  }, [privyUser?.id, page, limit]);
+  }, [user?.id, page, limit]);
 
   const showSnackbar = (message, severity = 'success') => {
     setSnackbar({ open: true, message, severity });
