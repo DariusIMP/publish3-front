@@ -3,6 +3,7 @@
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
+import { useWallets } from '@privy-io/react-auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState, useEffect, useCallback } from 'react';
 
@@ -13,21 +14,21 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import { toast } from 'src/components/snackbar';
-
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
+import { fetchMoveBalance } from 'src/lib/aptos';
 import { getAuthorsList } from 'src/actions/authors';
 import axiosInstance, { endpoints } from 'src/lib/axios';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { getPublicationsList } from 'src/actions/publications/action';
 
+import { toast } from 'src/components/snackbar';
 import { Form, Field } from 'src/components/hook-form';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { TransactionCostDialog } from 'src/components/transaction/transaction-cost-dialog';
 
 import { SimplePdfView } from 'src/sections/pdf/view/simple-pdf-view';
-import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -144,15 +145,22 @@ const UploadArea = ({ onDrop }) => {
 
 export function PublicationCreateView() {
   const router = useRouter();
+  const { wallets } = useWallets();
+  const walletAddress = wallets?.[0]?.address;
   const fileIsLoaded = useBoolean(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [tags, setTags] = useState([]);
   const [inputTag, setInputTag] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [authors, setAuthors] = useState([]);
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [publications, setPublications] = useState([]);
   const [selectedCitations, setSelectedCitations] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [simulationResult, setSimulationResult] = useState(null);
+  const [userBalanceOctas, setUserBalanceOctas] = useState();
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [formData, setFormData] = useState(null);
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -243,63 +251,93 @@ export function PublicationCreateView() {
       return;
     }
 
-    setIsSubmitting(true);
+    setIsSimulating(true);
     try {
       // Create FormData for multipart upload
-      const formData = new FormData();
+      const localFormData = new FormData();
 
       // Add file
-      formData.append('file', selectedFile);
+      localFormData.append('file', selectedFile);
 
       // Add other fields
-      formData.append('title', data.title);
+      localFormData.append('title', data.title);
       if (data.about) {
-        formData.append('about', data.about);
+        localFormData.append('about', data.about);
       }
       if (data.tags && data.tags !== '[]') {
-        formData.append('tags', data.tags);
+        localFormData.append('tags', data.tags);
       }
 
       // Add blockchain fields (price in octas)
-      formData.append('price', priceInOctas);
+      localFormData.append('price', priceInOctas);
 
       // Add authors as JSON array if any are selected
       if (selectedAuthors.length > 0) {
         const authorIds = selectedAuthors.map(author => author.id);
-        formData.append('authors', JSON.stringify(authorIds));
+        localFormData.append('authors', JSON.stringify(authorIds));
       }
 
       // Add citations as JSON array if any are selected
       if (selectedCitations.length > 0) {
         const citationIds = selectedCitations.map(pub => pub.id);
-        formData.append('citations', JSON.stringify(citationIds));
+        localFormData.append('citations', JSON.stringify(citationIds));
       }
 
-      // const simulate_response = await axiosInstance.post(endpoints.publications.simulate, formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //   },
-      // });
-      // console.info('Publication simulation:', simulate_response.data);
+      // Store formData for later submission
+      setFormData(localFormData);
 
-      // Send request with multipart/form-data
-      const create_response = await axiosInstance.post(endpoints.publications.create, formData, {
+      // 1. Simulate transaction
+      const simulateResponse = await axiosInstance.post(endpoints.publications.simulate, localFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const simulation = simulateResponse.data;
+      console.info('Publication simulation:', simulation);
+
+      // 2. Fetch user balance
+      let balance = 0;
+      if (walletAddress) {
+        balance = await fetchMoveBalance(walletAddress);
+      }
+
+      setSimulationResult(simulation);
+      setUserBalanceOctas(balance);
+      setDialogOpen(true);
+    } catch (error) {
+      console.error('Failed to simulate publication:', error);
+      toast.error(`Failed to simulate publication: ${error.message}`);
+    } finally {
+      setIsSimulating(false);
+    }
+  });
+
+  const handleConfirmPublish = async () => {
+    if (!formData) {
+      toast.error('No form data available');
+      return;
+    }
+
+    setIsPublishing(true);
+    try {
+      const createResponse = await axiosInstance.post(endpoints.publications.create, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      // console.info('Publication created successfully:', create_response.data);
-
-      const publicationId = create_response.data.id;
+      console.info('Publication created successfully:', createResponse.data);
+      const publicationId = createResponse.data.id;
+      toast.success('Publication submitted successfully!');
       router.push(paths.dashboard.publications.read(publicationId));
     } catch (error) {
       console.error('Failed to create publication:', error);
       toast.error(`Failed to create publication: ${error.message}`);
     } finally {
-      setIsSubmitting(false);
+      setIsPublishing(false);
+      setDialogOpen(false);
     }
-  });
+  };
 
   return (
     <DashboardContent maxWidth={false}>
@@ -511,8 +549,8 @@ export function PublicationCreateView() {
               <Button
                 type="submit"
                 variant="contained"
-                loading={isSubmitting}
-                disabled={!selectedFile}
+                loading={isSimulating}
+                disabled={!selectedFile || isSimulating}
               >
                 Upload Paper
               </Button>
@@ -520,6 +558,17 @@ export function PublicationCreateView() {
           </Box>
         </Box>
       </Form>
+
+      {simulationResult && (
+        <TransactionCostDialog
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          onConfirm={handleConfirmPublish}
+          simulationResult={simulationResult}
+          userBalanceOctas={userBalanceOctas}
+          loading={isPublishing}
+        />
+      )}
     </DashboardContent>
   );
 }
