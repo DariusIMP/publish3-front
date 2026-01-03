@@ -117,6 +117,7 @@ export const endpoints = {
   purchases: {
     listByUser: (userId) => `/purchases/user/${userId}`,
     count: '/purchases/count',
+    simulate: '/purchases/simulate',
   },
 
   // Publication Authors (junction table)

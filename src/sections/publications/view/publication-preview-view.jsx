@@ -29,6 +29,9 @@ import { useAuthContext } from 'src/auth/hooks';
 import axiosInstance, { endpoints } from 'src/lib/axios';
 
 import { fDate } from 'src/utils/format-time';
+import { PurchaseTransactionCostDialog } from 'src/components/transaction/purchase-transaction-cost-dialog';
+import { octasToMove, formatMoveBalance } from 'src/lib/aptos';
+import { useWalletContext } from 'src/context/wallet-context';
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +47,12 @@ export function PublicationPreviewView({ id }) {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
+  const [costDialogOpen, setCostDialogOpen] = useState(false);
+  const [simulationResult, setSimulationResult] = useState(null);
+  const [simulating, setSimulating] = useState(false);
+  const { moveBalance } = useWalletContext();
+  const publicationPriceMove = publication ? octasToMove(publication.price) : 0;
+  const insufficientFunds = moveBalance !== null && moveBalance < publicationPriceMove;
 
   useEffect(() => {
     async function loadPublication() {
@@ -86,7 +95,7 @@ export function PublicationPreviewView({ id }) {
   }, [publication, user?.id, id]);
 
 
-  const handlePurchase = async () => {
+  const handlePurchaseClick = async () => {
     if (!user?.id) {
       setSnackbar({
         open: true,
@@ -96,6 +105,33 @@ export function PublicationPreviewView({ id }) {
       return;
     }
 
+    setSimulating(true);
+    try {
+      const response = await axiosInstance.post(endpoints.purchases.simulate, {
+        publication_id: id,
+      });
+      setSimulationResult(response.data);
+      setCostDialogOpen(true);
+    } catch (error) {
+      console.error('Failed to simulate purchase:', error);
+      let errorMessage = 'Failed to estimate transaction cost';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: 'error',
+      });
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const handleConfirmPurchase = async () => {
+    setCostDialogOpen(false);
     setPurchasing(true);
     setPurchaseError(null);
     setPurchaseSuccess(false);
@@ -133,6 +169,10 @@ export function PublicationPreviewView({ id }) {
     } finally {
       setPurchasing(false);
     }
+  };
+
+  const handleCostDialogClose = () => {
+    setCostDialogOpen(false);
   };
 
   const handleCloseSnackbar = () => {
@@ -291,6 +331,16 @@ export function PublicationPreviewView({ id }) {
                     {publication.tags ? publication.tags.length : 0}
                   </Typography>
                 </Box>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 120 }}>
+                    <Iconify icon="solar:wallet-bold" width={20} />
+                    <Typography variant="body2">Price:</Typography>
+                  </Box>
+                  <Typography variant="body1" fontWeight="medium">
+                    {formatMoveBalance(octasToMove(publication.price), 2)} Move
+                  </Typography>
+                </Box>
               </Stack>
             </Box>
 
@@ -342,16 +392,26 @@ export function PublicationPreviewView({ id }) {
                     Purchase this publication to get full access to the complete paper, including all figures, data, and references.
                   </Typography>
 
+                  {moveBalance === null ? (
+                    <Alert severity="info" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+                      Loading wallet balance...
+                    </Alert>
+                  ) : insufficientFunds ? (
+                    <Alert severity="error" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+                      Insufficient funds. You need {formatMoveBalance(publicationPriceMove - moveBalance, 2)} more Move to purchase this publication.
+                    </Alert>
+                  ) : null}
+
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
                     <Button
                       variant="contained"
                       size="large"
                       startIcon={<Iconify icon="solar:cart-bold" />}
                       sx={{ minWidth: 200 }}
-                      onClick={handlePurchase}
-                      disabled={purchasing}
+                      onClick={handlePurchaseClick}
+                      disabled={simulating || purchasing || insufficientFunds || moveBalance === null}
                     >
-                      {purchasing ? 'Processing Purchase...' : 'Purchase Paper'}
+                      {simulating ? 'Estimating Cost...' : purchasing ? 'Processing Purchase...' : 'Purchase Paper'}
                     </Button>
 
                     <Button
@@ -390,6 +450,17 @@ export function PublicationPreviewView({ id }) {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {simulationResult && (
+        <PurchaseTransactionCostDialog
+          open={costDialogOpen}
+          onClose={handleCostDialogClose}
+          onConfirm={handleConfirmPurchase}
+          simulationResult={simulationResult}
+          publicationPriceOctas={publication.price}
+          loading={purchasing}
+        />
+      )}
     </DashboardContent>
   );
 }

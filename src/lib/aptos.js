@@ -53,12 +53,13 @@ export function octasToMove(octas) {
 }
 
 /**
- * Format Move balance with up to 8 decimal places, removing trailing zeros
+ * Format Move balance with up to specified decimal places, removing trailing zeros
  * @param {number} moveBalance
+ * @param {number} [maxDecimals=8] - maximum decimal places to show (default 8)
  * @returns {string}
  */
-export function formatMoveBalance(moveBalance) {
-  const formatted = moveBalance.toFixed(8);
+export function formatMoveBalance(moveBalance, maxDecimals = 8) {
+  const formatted = moveBalance.toFixed(maxDecimals);
   // Remove trailing zeros and the decimal point if all zeros after it
   return formatted.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.$/, '');
 }
