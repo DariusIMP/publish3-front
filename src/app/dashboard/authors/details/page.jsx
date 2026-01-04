@@ -8,6 +8,7 @@ import Card from '@mui/material/Card';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { paths } from 'src/routes/paths';
@@ -211,8 +212,8 @@ export default function AuthorDetailsPage() {
 
           <Grid item xs={12} md={4}>
             <AnalyticsWidgetSummary
-              title="Revenue"
-              total={stats.revenue}
+              title="Revenue [Move]"
+              total={stats.revenue / 1_000_000_00}
               percent={stats.revenue > 0 ? 12 : 0}
               chart={{
                 series: [stats.revenue, Math.max(0, stats.revenue - 100), Math.max(0, stats.revenue - 50), Math.max(0, stats.revenue - 150), Math.max(0, stats.revenue - 75)],
@@ -242,32 +243,30 @@ export default function AuthorDetailsPage() {
                     Showing {publications.length} publication{publications.length !== 1 ? 's' : ''}
                   </Typography>
 
-                  <Grid container spacing={2}>
+                  <Stack spacing={2}>
                     {publications.map((publication) => (
-                      <Grid item xs={12} key={publication.id}>
-                        <Card variant="outlined" sx={{ p: 2 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                            {publication.title}
+                      <Card variant="outlined" sx={{ p: 2, width: '100%' }} key={publication.id}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+                          {publication.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                          {publication.about?.substring(0, 150)}...
+                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            Published: {new Date(publication.created_at).toLocaleDateString()}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                            {publication.about?.substring(0, 150)}...
-                          </Typography>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                            <Typography variant="caption" color="text.secondary">
-                              Published: {new Date(publication.created_at).toLocaleDateString()}
-                            </Typography>
-                            <Button
-                              size="small"
-                              variant="text"
-                              onClick={() => router.push(paths.dashboard.publications.details(publication.id))}
-                            >
-                              View Details
-                            </Button>
-                          </Box>
-                        </Card>
-                      </Grid>
+                          <Button
+                            size="small"
+                            variant="text"
+                            onClick={() => router.push(paths.dashboard.publications.details(publication.id))}
+                          >
+                            View Details
+                          </Button>
+                        </Box>
+                      </Card>
                     ))}
-                  </Grid>
+                  </Stack>
                 </Box>
               )}
             </Card>

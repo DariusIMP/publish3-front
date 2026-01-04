@@ -30,7 +30,7 @@ export function AuthorCardList({ authors }) {
         {authors
           .slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage)
           .map((author) => (
-            <AuthorCard key={author.id} author={author} />
+            <AuthorCard key={author.privy_id} author={author} />
           ))}
       </Box>
 

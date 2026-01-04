@@ -8,18 +8,18 @@ import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { SeoIllustration } from 'src/assets/illustrations';
 import { _appAuthors, _appRelated, _appInvoices, _appInstalled } from 'src/_mock';
 
 import { svgColorClasses } from 'src/components/svg-color';
 
-import { useMockedUser } from 'src/auth/hooks';
+import { useWalletContext } from 'src/context/wallet-context';
 
 import { AppWidget } from '../app-widget';
 import { AppWelcome } from '../app-welcome';
 import { AppFeatured } from '../app-featured';
 import { AppTopAuthors } from '../app-top-authors';
 import { AppWidgetSummary } from '../app-widget-summary';
+import { WalletCurrentBalance } from 'src/components/wallet/wallet-current-balance';
 import { CONFIG } from 'src/global-config';
 import { RouterLink } from 'src/routes/components';
 import { paths } from 'src/routes/paths';
@@ -31,7 +31,6 @@ import { getTopAuthorsByPurchases } from 'src/actions/authors/action';
 // ----------------------------------------------------------------------
 
 export function OverviewAppView() {
-  const { user } = useMockedUser();
   const theme = useTheme();
   const [featuredPublications, setFeaturedPublications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +38,7 @@ export function OverviewAppView() {
   const [publicationsCount, setPublicationsCount] = useState(0);
   const [purchasesCount, setPurchasesCount] = useState(0);
   const [topAuthors, setTopAuthors] = useState([]);
+  const { moveBalance } = useWalletContext();
 
   useEffect(() => {
     async function fetchData() {
@@ -155,30 +155,11 @@ export function OverviewAppView() {
           <AppTopAuthors title="Top authors" list={topAuthors} />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-          <Box sx={{ gap: 3, display: 'flex', flexDirection: 'column' }}>
-            <AppWidget
-              title="Conversion"
-              total={38566}
-              icon="solar:user-rounded-bold"
-              chart={{ series: 48 }}
-            />
 
-            <AppWidget
-              title="Applications"
-              total={55566}
-              icon="solar:letter-bold"
-              chart={{
-                series: 75,
-                colors: [theme.vars.palette.info.light, theme.vars.palette.info.main],
-              }}
-              sx={{
-                bgcolor: 'info.dark',
-                [`& .${svgColorClasses.root}`]: { color: 'info.light' },
-              }}
-            />
-          </Box>
+        <Grid size={{ xs: 4 }}>
+          <WalletCurrentBalance balance={moveBalance ?? 0} />
         </Grid>
+        
       </Grid>
     </DashboardContent>
   );
