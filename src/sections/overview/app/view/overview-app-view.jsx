@@ -20,6 +20,7 @@ import { AppFeatured } from '../app-featured';
 import { AppTopAuthors } from '../app-top-authors';
 import { AppWidgetSummary } from '../app-widget-summary';
 import { WalletCurrentBalance } from 'src/components/wallet/wallet-current-balance';
+import { ContractExplorerCard } from 'src/components/contract-explorer-card';
 import { CONFIG } from 'src/global-config';
 import { RouterLink } from 'src/routes/components';
 import { paths } from 'src/routes/paths';
@@ -151,14 +152,19 @@ export function OverviewAppView() {
           />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+        <Grid size={{ xs: 12, md: 4, lg: 4 }}>
           <AppTopAuthors title="Top authors" list={topAuthors} />
         </Grid>
 
 
-        <Grid size={{ xs: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <WalletCurrentBalance balance={moveBalance ?? 0} />
         </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <ContractExplorerCard />
+        </Grid>
+        
         
       </Grid>
     </DashboardContent>

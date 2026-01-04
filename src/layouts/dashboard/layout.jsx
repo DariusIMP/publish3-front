@@ -25,7 +25,7 @@ import { _workspaces } from '../nav-config-workspace';
 import { MenuButton } from '../components/menu-button';
 import { AccountDrawer } from '../components/account-drawer';
 import { LanguagePopover } from '../components/language-popover';
-import { SettingsButton } from '../components/settings-button';
+import { ThemeModeButton } from '../components/theme-mode-button';
 import { WalletPopover } from '../components/wallet-popover';
 import { ContactsPopover } from '../components/contacts-popover';
 import { WorkspacesPopover } from '../components/workspaces-popover';
@@ -134,8 +134,8 @@ export function DashboardLayout({ sx, cssVars, children, slotProps, layoutQuery 
           {/** @slot Wallet popover */}
           <WalletPopover />
 
-          {/** @slot Settings button */}
-          <SettingsButton />
+          {/** @slot Theme mode button */}
+          <ThemeModeButton />
 
           {/** @slot Account drawer */}
           <AccountDrawer data={_account} />

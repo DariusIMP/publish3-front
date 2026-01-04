@@ -79,7 +79,7 @@ export default async function RootLayout({ children }) {
                     <MotionLazy>
                       <ProgressBar />
                       <Snackbar />
-                      <SettingsDrawer defaultSettings={defaultSettings} />
+                      {/* <SettingsDrawer defaultSettings={defaultSettings} /> */}
                       {children}
                     </MotionLazy>
                   </ThemeProvider>
