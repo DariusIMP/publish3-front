@@ -133,7 +133,10 @@ export function WalletProvider({ children }) {
 
   const handleRefresh = useCallback(async () => {
     await loadWalletData();
-  }, [loadWalletData]);
+    if (walletAddress) {
+      await loadBalance();
+    }
+  }, [loadWalletData, walletAddress, loadBalance]);
 
   const handleFundWallet = useCallback(async () => {
     if (!walletAddress) return;

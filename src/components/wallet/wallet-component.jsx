@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,137 +9,64 @@ import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
 
-// ----------------------------------------------------------------------
-
-// Constants for Movement RPC
-const MOVEMENT_RPC_URL = 'https://testnet.movementnetwork.xyz';
-const APTOS_COIN_TYPE = '0x1::aptos_coin::AptosCoin';
-const MOVE_TO_OCTAS_FACTOR = 100_000_000;
-
-// Function to fetch Move balance from Movement testnet
-async function fetchMoveBalance(walletAddress) {
-  if (!walletAddress) {
-    return 0;
-  }
-
-  try {
-    // Ensure wallet address has 0x prefix
-    const formattedAddress = walletAddress.startsWith('0x') ? walletAddress : `0x${walletAddress}`;
-
-    const response = await fetch(
-      `${MOVEMENT_RPC_URL}/v1/accounts/${formattedAddress}/balance/${APTOS_COIN_TYPE}`,
-      {
-        headers: {
-          'Accept': 'application/json, application/x-bcs'
-        }
-      }
-    );
-
-    if (!response.ok) {
-      // Handle 404 (wallet exists but has 0 balance) vs other errors
-      if (response.status === 404) {
-        return 0; // Wallet exists but has 0 balance
-      }
-      throw new Error(`Movement RPC error: ${response.status}`);
-    }
-
-    // The endpoint returns octas (10^8 octas = 1 MOVE)
-    const octas = await response.json();
-    return parseInt(octas);
-  } catch (error) {
-    console.error('Failed to fetch Move balance:', error);
-    return 0; // Fallback to 0 on error
-  }
-}
+import { useWalletContext } from 'src/context/wallet-context';
 
 // ----------------------------------------------------------------------
 
 export default function WalletComponent({
-  walletAddress,
-  collectedMoney = 0,
+  walletAddress: propWalletAddress,
+  collectedMoney: propCollectedMoney = 0,
   registrationDate,
   showFundButton = false
 }) {
-  const [moveBalance, setMoveBalance] = useState(0);
-  const [balanceLoading, setBalanceLoading] = useState(false);
-  const [funding, setFunding] = useState(false);
-  const [balanceError, setBalanceError] = useState(null);
+  // Use wallet context for wallet data and operations
+  const {
+    walletAddress: contextWalletAddress,
+    moveBalance,
+    collectedMoney: contextCollectedMoney,
+    balanceLoading,
+    funding,
+    error: balanceError,
+    handleRefresh,
+    handleFundWallet,
+    formatMoveBalance,
+  } = useWalletContext();
 
-  // Fetch balance when wallet address changes
+  // Use props if provided, otherwise use context values
+  const walletAddress = propWalletAddress || contextWalletAddress;
+  const collectedMoney = propCollectedMoney || contextCollectedMoney;
+
+  // Local error state for component-specific errors
+  const [localError, setLocalError] = useState(null);
+
+  // Clear local error when wallet address changes
   useEffect(() => {
-    if (walletAddress) {
-      loadBalance();
-    } else {
-      setMoveBalance(0);
-    }
-  }, [walletAddress, loadBalance]);
-
-  const loadBalance = useCallback(async () => {
-    if (!walletAddress) return;
-
-    setBalanceLoading(true);
-    setBalanceError(null);
-
-    try {
-      const balance = await fetchMoveBalance(walletAddress);
-      setMoveBalance(balance / MOVE_TO_OCTAS_FACTOR);
-    } catch (error) {
-      console.error('Error loading balance:', error);
-      setBalanceError('Failed to load balance');
-      setMoveBalance(0);
-    } finally {
-      setBalanceLoading(false);
-    }
+    setLocalError(null);
   }, [walletAddress]);
 
-  const handleRefresh = () => {
-    loadBalance();
+  const handleComponentRefresh = () => {
+    setLocalError(null);
+    handleRefresh();
   };
 
-  const formatMoveBalance = (balance) => {
+  const handleComponentFundWallet = async () => {
+    try {
+      await handleFundWallet();
+    } catch (error) {
+      console.error('Failed to fund wallet:', error);
+      setLocalError(`Failed to fund wallet: ${error.message}`);
+    }
+  };
+
+  const formatMoveBalanceLocal = (balance) => {
     // Format with up to 8 decimal places, remove trailing zeros
     const formatted = balance.toFixed(8);
     // Remove trailing zeros and the decimal point if all zeros after it
     return formatted.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.$/, '');
   };
 
-  const handleFundWallet = async () => {
-    if (!walletAddress) return;
-
-    setFunding(true);
-    try {
-      // Ensure wallet address has 0x prefix
-      const formattedAddress = walletAddress.startsWith('0x') ? walletAddress : `0x${walletAddress}`;
-
-      const response = await fetch('https://faucet.testnet.movementnetwork.xyz/fund', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          address: formattedAddress,
-          amount: 10 * MOVE_TO_OCTAS_FACTOR,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Faucet error: ${response.status} - ${errorText}`);
-      }
-
-      // Wait a moment for the transaction to be processed
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Refresh balance after funding
-      await loadBalance();
-
-    } catch (error) {
-      console.error('Failed to fund wallet:', error);
-      setBalanceError(`Failed to fund wallet: ${error.message}`);
-    } finally {
-      setFunding(false);
-    }
-  };
+  // Use context's formatMoveBalance if available, otherwise use local
+  const displayFormatMoveBalance = formatMoveBalance || formatMoveBalanceLocal;
 
   return (
     <Card sx={{ p: 3, height: '100%' }}>
@@ -164,7 +91,7 @@ export default function WalletComponent({
             </Typography>
             <Button
               size="small"
-              onClick={handleRefresh}
+              onClick={handleComponentRefresh}
               disabled={balanceLoading || !walletAddress}
               sx={{ ml: 1, minWidth: 'auto', padding: '4px 8px' }}
             >
@@ -179,14 +106,14 @@ export default function WalletComponent({
                 Loading balance...
               </Typography>
             </Box>
-          ) : balanceError ? (
+          ) : localError || balanceError ? (
             <Typography variant="body2" color="error" sx={{ mt: 0.5 }}>
-              {balanceError}
+              {localError || balanceError}
             </Typography>
           ) : (
             <>
               <Typography variant="h6" sx={{ mt: 0.5 }}>
-                {formatMoveBalance(moveBalance)} Move
+                {displayFormatMoveBalance(moveBalance)} Move
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 Live balance from Movement testnet (1 Move = 100,000,000 octas)
@@ -222,7 +149,7 @@ export default function WalletComponent({
               variant="contained"
               fullWidth
               size="medium"
-              onClick={handleFundWallet}
+              onClick={handleComponentFundWallet}
               disabled={funding || balanceLoading}
               startIcon={funding ? <CircularProgress size={20} color="inherit" /> : null}
             >
