@@ -51,8 +51,6 @@ export function AuthSplitLayout({ sx, cssVars, children, slotProps, layoutQuery 
             Need help?
           </Link>
 
-          {/** @slot Settings button */}
-          <SettingsButton />
         </Box>
       ),
     };

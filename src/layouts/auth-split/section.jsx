@@ -16,9 +16,9 @@ export function AuthSplitSection({
   method,
   methods,
   layoutQuery = 'md',
-  title = 'Publish & Earn',
+  title = 'Welcome back',
   imgUrl = `${CONFIG.assetsDir}/assets/illustrations/illustration-dashboard.png`,
-  subtitle = 'Mint research papers as on-chain assets and earn micro-royalties from downloads and citations.',
+  subtitle = 'Publish content you truly own. Permanent, verifiable, and independent.',
   ...other
 }) {
   return (
