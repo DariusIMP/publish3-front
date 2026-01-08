@@ -1,5 +1,6 @@
-import { Iconify } from 'src/components/iconify';
 import { paths } from 'src/routes/paths';
+
+import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 

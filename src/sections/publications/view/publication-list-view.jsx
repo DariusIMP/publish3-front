@@ -2,25 +2,27 @@
 
 import { orderBy } from 'es-toolkit';
 import { useSetState } from 'minimal-shared/hooks';
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import Button from '@mui/material/Button';
 
-import { getPublicationsList } from 'src/actions/publications/action';
-import { useAuthContext } from 'src/auth/hooks';
-
-import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import { Iconify } from 'src/components/iconify';
-import { Label } from 'src/components/label';
-import { DashboardContent } from 'src/layouts/dashboard';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
-import { PublicationSearch } from '../publication-search';
+import { DashboardContent } from 'src/layouts/dashboard';
+import { getPublicationsList } from 'src/actions/publications/action';
+
+import { Label } from 'src/components/label';
+import { Iconify } from 'src/components/iconify';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+
+import { useAuthContext } from 'src/auth/hooks';
+
 import { PublicationSort } from '../publication-sort';
+import { PublicationSearch } from '../publication-search';
 import { PublicationListHorizontal } from '../publication-list-horizontal';
 
 // ----------------------------------------------------------------------

@@ -3,23 +3,24 @@
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CircularProgress from '@mui/material/CircularProgress';
-import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { AnalyticsWidgetSummary } from 'src/components/analytics-widget-summary/analytics-widget-summary';
 
 import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +33,6 @@ export default function AuthorDetailsPage() {
   const [publications, setPublications] = useState([]);
   const [publicationsLoading, setPublicationsLoading] = useState(false);
   const [stats, setStats] = useState({ publication_count: 0, purchase_count: 0, revenue: 0 });
-  const [statsLoading, setStatsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -71,18 +71,14 @@ export default function AuthorDetailsPage() {
     };
 
     fetchAuthorData();
-  }, [user?.id, user]);
+  }, [user?.id, updateAuthor, user]);
 
   const fetchAuthorStats = async (authorId) => {
     try {
-      setStatsLoading(true);
       const response = await axiosInstance.get(endpoints.authors.getStats(authorId));
       setStats(response.data);
     } catch (err) {
       console.error('Failed to fetch author stats:', err);
-      // Don't set error for stats - just log it
-    } finally {
-      setStatsLoading(false);
     }
   };
 
@@ -99,10 +95,6 @@ export default function AuthorDetailsPage() {
     } finally {
       setPublicationsLoading(false);
     }
-  };
-
-  const handleEdit = () => {
-    router.push(paths.dashboard.authors.details.edit);
   };
 
   if (loading) {

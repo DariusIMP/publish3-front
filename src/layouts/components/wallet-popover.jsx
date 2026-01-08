@@ -6,17 +6,18 @@ import { usePopover } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+
+import { paths } from 'src/routes/paths';
+
+import { useWalletContext } from 'src/context/wallet-context';
 
 import { Iconify } from 'src/components/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 import { varTap, varHover, transitionTap } from 'src/components/animate';
-
-import { useWalletContext } from 'src/context/wallet-context';
-import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -30,10 +31,8 @@ export function WalletPopover({ sx, ...other }) {
     collectedMoney,
     loading,
     balanceLoading,
-    funding,
     error,
     handleRefresh,
-    handleFundWallet,
     formatMoveBalance,
     formatAddress,
   } = useWalletContext();

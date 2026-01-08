@@ -1,29 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-
-import { toast } from 'src/components/snackbar';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
+import { toast } from 'src/components/snackbar';
 import { Form, Field } from 'src/components/hook-form';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ export default function AuthorEditPage() {
   const router = useRouter();
   const { updateAuthor } = useAuthContext();
   const { user: privyUser } = usePrivy();
-  
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -62,12 +62,8 @@ export default function AuthorEditPage() {
   const {
     handleSubmit,
     reset,
-    formState: { isSubmitting, errors },
-    setValue,
-    watch,
+    formState: { isSubmitting },
   } = methods;
-
-  const walletAddress = watch('wallet_address');
 
   useEffect(() => {
     const fetchAuthorData = async () => {
@@ -80,17 +76,17 @@ export default function AuthorEditPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await axiosInstance.get(endpoints.authors.get(privyUser.id));
         const authorData = response.data;
-        
+
         reset({
           name: authorData.name || '',
           email: authorData.email || '',
           affiliation: authorData.affiliation || '',
           wallet_address: authorData.wallet_address || '',
         });
-        
+
       } catch (err) {
         console.error('Failed to fetch author data:', err);
         setError(err.message || 'Failed to load author data');
@@ -120,22 +116,22 @@ export default function AuthorEditPage() {
       };
 
       console.log('Updating author with data:', authorData);
-      
+
       const response = await axiosInstance.put(endpoints.authors.update(privyUser.id), authorData);
-      
+
       console.log('Author updated successfully:', response.data);
-      
+
       if (updateAuthor) {
         const authorResponse = await axiosInstance.get(endpoints.authors.get(privyUser.id));
         updateAuthor(authorResponse.data);
       }
-      
+
       toast.success('Author information updated successfully!');
-      
+
       // Redirect immediately
       router.push(paths.dashboard.authors.details.view);
     } catch (err) {
-      console.error('Failed to update author:', err);      
+      console.error('Failed to update author:', err);
       setError(err.message);
     } finally {
       setSubmitting(false);

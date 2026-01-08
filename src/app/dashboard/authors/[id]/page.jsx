@@ -4,21 +4,21 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CircularProgress from '@mui/material/CircularProgress';
-import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import { Iconify } from 'src/components/iconify';
-
 import axiosInstance, { endpoints } from 'src/lib/axios';
+
+import { Iconify } from 'src/components/iconify';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 // ----------------------------------------------------------------------
 
@@ -63,10 +63,10 @@ export default function AuthorViewPage() {
     fetchAuthorData();
   }, [authorId]);
 
-  const fetchAuthorPublications = async (authorId) => {
+  const fetchAuthorPublications = async (id) => {
     try {
       setPublicationsLoading(true);
-      const response = await axiosInstance.get(endpoints.publications.listByUser(authorId));
+      const response = await axiosInstance.get(endpoints.publications.listByUser(id));
       setPublications(response.data.publications || []);
     } catch (err) {
       console.error('Failed to fetch publications:', err);

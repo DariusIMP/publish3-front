@@ -10,7 +10,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import CircularProgress from '@mui/material/CircularProgress';
 import Autocomplete, { autocompleteClasses, createFilterOptions } from '@mui/material/Autocomplete';
 
-import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { searchPublicationsByTitle } from 'src/actions/publications/action';
@@ -21,8 +20,6 @@ import { SearchNotFound } from 'src/components/search-not-found';
 // ----------------------------------------------------------------------
 
 export function PublicationSearch({ sx }) {
-  const router = useRouter();
-
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [options, setOptions] = useState([]);

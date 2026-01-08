@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
-
-import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -74,9 +72,9 @@ export default function WalletComponent({
     } else {
       setMoveBalance(0);
     }
-  }, [walletAddress]);
+  }, [walletAddress, loadBalance]);
 
-  const loadBalance = async () => {
+  const loadBalance = useCallback(async () => {
     if (!walletAddress) return;
 
     setBalanceLoading(true);
@@ -92,7 +90,7 @@ export default function WalletComponent({
     } finally {
       setBalanceLoading(false);
     }
-  };
+  }, [walletAddress]);
 
   const handleRefresh = () => {
     loadBalance();

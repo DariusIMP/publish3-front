@@ -22,31 +22,34 @@ export function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale = 1 }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let url = null;
     if (pdfFile) {
-      const url = URL.createObjectURL(pdfFile);
+      url = URL.createObjectURL(pdfFile);
       setPdfUrl(url);
       setError(null);
-
-      return () => {
-        URL.revokeObjectURL(url);
-      };
     } else if (externalPdfUrl) {
       setPdfUrl(externalPdfUrl);
       setError(null);
     } else {
       setPdfUrl(null);
     }
+    return () => {
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
   }, [pdfFile, externalPdfUrl]);
 
   const onDocumentLoadSuccess = ({ numPages: totalNumPages }) => {
     setNumPages(totalNumPages);
     setError(null);
+    return undefined;
   };
 
-  const onDocumentLoadError = (err) => {
+  function onDocumentLoadError(err) {
     console.error('Error loading PDF:', err);
     setError('Failed to load PDF. The file may be corrupted or inaccessible.');
-  };
+  }
 
   if (!pdfUrl) {
     return (

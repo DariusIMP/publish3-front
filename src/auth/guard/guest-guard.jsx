@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
+import { useState, useEffect, useCallback } from 'react';
 
 import { useRouter, useSearchParams } from 'src/routes/hooks';
 
 import { CONFIG } from 'src/global-config';
 
 import { SplashScreen } from 'src/components/loading-screen';
-
-import { usePrivy } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -22,7 +21,7 @@ export function GuestGuard({ children }) {
 
   const [isChecking, setIsChecking] = useState(true);
 
-  const checkPermissions = async () => {
+  const checkPermissions = useCallback(async () => {
     if (!ready) {
       return;
     }
@@ -33,11 +32,11 @@ export function GuestGuard({ children }) {
     }
 
     setIsChecking(false);
-  };
+  }, [authenticated, ready, router, returnTo]);
 
   useEffect(() => {
     checkPermissions();
-  }, [authenticated, ready]);
+  }, [checkPermissions]);
 
   if (isChecking) {
     return <SplashScreen />;

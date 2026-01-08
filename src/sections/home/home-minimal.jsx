@@ -25,7 +25,7 @@ export function HomeMinimal({ sx, ...other }) {
       </Typography>
 
       <Typography variant="body1" sx={{ mb: 6, color: 'text.secondary', maxWidth: 800, mx: 'auto' }}>
-        Using Movement's x402 payment rails, every purchase or citation of a paper triggers automated, real-time micropayments to the authors and to the researchers whose work was cited—creating the first incentive-aligned economic system for scientific knowledge.
+        Using Movement&#39;s x402 payment rails, every purchase or citation of a paper triggers automated, real-time micropayments to the authors and to the researchers whose work was cited—creating the first incentive-aligned economic system for scientific knowledge.
       </Typography>
 
       <Box

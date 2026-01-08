@@ -1,40 +1,49 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
-import Container from '@mui/material/Container';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import Tooltip from '@mui/material/Tooltip';
+import Snackbar from '@mui/material/Snackbar';
+import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { usePrivy } from '@privy-io/react-auth';
-
-import { getPublication, getPublicationPdfUrl } from 'src/actions/publications/action';
-
-import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import { Iconify } from 'src/components/iconify';
+import { paths } from 'src/routes/paths';
+import { useRouter as useRouterHook } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-
-import { useRouter as useRouterHook } from 'src/routes/hooks';
-import { paths } from 'src/routes/paths';
-
 import axiosInstance, { endpoints } from 'src/lib/axios';
+import { getPublication, getPublicationPdfUrl } from 'src/actions/publications/action';
 
-import { SimplePdfView } from 'src/sections/pdf/view/simple-pdf-view';
+import { Iconify } from 'src/components/iconify';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+
 import { useAuthContext } from 'src/auth/hooks';
+
+const SimplePdfView = dynamic(() => import('src/sections/pdf/view/simple-pdf-view'), {
+  ssr: false,
+  loading: () => (
+    <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <Box sx={{ typography: 'body1', color: 'text.secondary' }}>
+          Loading PDF viewer...
+        </Box>
+      </Box>
+    </Box>
+  ),
+});
 
 // ----------------------------------------------------------------------
 

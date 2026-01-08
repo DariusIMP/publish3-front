@@ -1,10 +1,9 @@
 import { useCallback } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 
 import Button from '@mui/material/Button';
 
 import { useRouter } from 'src/routes/hooks';
-
-import { usePrivy } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +23,7 @@ export function SignOutButton({ onClose, sx, ...other }) {
     } catch (error) {
       console.error(error);
     }
-  }, [authenticated, onClose, router]);
+  }, [logout, onClose, router]);
 
   return (
     <Button

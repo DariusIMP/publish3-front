@@ -1,7 +1,8 @@
 'use client'
 
-import { Button, Stack, Typography } from "@mui/material";
 import { usePrivy, useLogin } from "@privy-io/react-auth";
+
+import { Stack, Button, Typography } from "@mui/material";
 
 export function PrivySignInView() {
   const { ready, authenticated } = usePrivy();

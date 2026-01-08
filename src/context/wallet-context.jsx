@@ -1,9 +1,10 @@
 'use client';
 
-import { createContext, use, useState, useEffect, useCallback } from 'react';
+import { use, useState, useEffect, useCallback, createContext } from 'react';
+
+import axiosInstance, { endpoints } from 'src/lib/axios';
 
 import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -65,28 +66,6 @@ export function WalletProvider({ children }) {
   const [funding, setFunding] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch wallet data when user changes
-  useEffect(() => {
-    if (user?.id) {
-      loadWalletData();
-    } else {
-      // Reset state when user logs out
-      setWalletAddress(null);
-      setMoveBalance(0);
-      setCollectedMoney(0);
-      setError(null);
-    }
-  }, [user?.id]);
-
-  // Load balance when wallet address changes
-  useEffect(() => {
-    if (walletAddress) {
-      loadBalance();
-    } else {
-      setMoveBalance(0);
-    }
-  }, [walletAddress]);
-
   const loadWalletData = useCallback(async () => {
     if (!user?.id) return;
 
@@ -122,13 +101,35 @@ export function WalletProvider({ children }) {
     try {
       const balance = await fetchMoveBalance(walletAddress);
       setMoveBalance(balance / MOVE_TO_OCTAS_FACTOR);
-    } catch (error) {
-      console.error('Error loading balance:', error);
+    } catch (err) {
+      console.error('Error loading balance:', err);
       setMoveBalance(0);
     } finally {
       setBalanceLoading(false);
     }
   }, [walletAddress]);
+
+  // Fetch wallet data when user changes
+  useEffect(() => {
+    if (user?.id) {
+      loadWalletData();
+    } else {
+      // Reset state when user logs out
+      setWalletAddress(null);
+      setMoveBalance(0);
+      setCollectedMoney(0);
+      setError(null);
+    }
+  }, [user?.id, loadWalletData]);
+
+  // Load balance when wallet address changes
+  useEffect(() => {
+    if (walletAddress) {
+      loadBalance();
+    } else {
+      setMoveBalance(0);
+    }
+  }, [walletAddress, loadBalance]);
 
   const handleRefresh = useCallback(async () => {
     await loadWalletData();
@@ -164,9 +165,9 @@ export function WalletProvider({ children }) {
       // Refresh balance after funding
       await loadBalance();
 
-    } catch (error) {
-      console.error('Failed to fund wallet:', error);
-      setError(`Failed to fund wallet: ${error.message}`);
+    } catch (err) {
+      console.error('Failed to fund wallet:', err);
+      setError(`Failed to fund wallet: ${err.message}`);
     } finally {
       setFunding(false);
     }

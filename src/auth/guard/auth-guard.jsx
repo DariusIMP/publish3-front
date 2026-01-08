@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
+import { useState, useEffect, useCallback } from 'react';
 
 import { paths } from 'src/routes/paths';
 import { useRouter, usePathname } from 'src/routes/hooks';
@@ -8,8 +9,6 @@ import { useRouter, usePathname } from 'src/routes/hooks';
 import { CONFIG } from 'src/global-config';
 
 import { SplashScreen } from 'src/components/loading-screen';
-
-import { usePrivy } from '@privy-io/react-auth';
 
 // ----------------------------------------------------------------------
 
@@ -25,12 +24,12 @@ export function AuthGuard({ children }) {
 
   const [isChecking, setIsChecking] = useState(true);
 
-  const createRedirectPath = (currentPath) => {
+  const createRedirectPath = useCallback((currentPath) => {
     const queryString = new URLSearchParams({ returnTo: pathname }).toString();
     return `${currentPath}?${queryString}`;
-  };
+  }, [pathname]);
 
-  const checkPermissions = async () => {
+  const checkPermissions = useCallback(async () => {
     if (!ready) {
       return;
     }
@@ -46,11 +45,11 @@ export function AuthGuard({ children }) {
     }
 
     setIsChecking(false);
-  };
+  }, [authenticated, ready, router, createRedirectPath]);
 
   useEffect(() => {
     checkPermissions();
-  }, [authenticated, ready]);
+  }, [checkPermissions]);
 
   if (isChecking) {
     return <SplashScreen />;

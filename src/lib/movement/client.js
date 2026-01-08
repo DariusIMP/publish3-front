@@ -1,4 +1,4 @@
-import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
+import { Aptos, Network, AptosConfig } from '@aptos-labs/ts-sdk';
 
 // Configure Aptos client for Movement testnet
 const config = new AptosConfig({

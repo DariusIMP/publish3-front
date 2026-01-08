@@ -9,7 +9,7 @@ import { varTap, varHover, transitionTap } from 'src/components/animate';
 // ----------------------------------------------------------------------
 
 export function ThemeModeButton({ sx, ...other }) {
-  const { mode, setMode, colorScheme } = useColorScheme();
+  const { setMode, colorScheme } = useColorScheme();
 
   const toggleMode = () => {
     setMode(colorScheme === 'light' ? 'dark' : 'light');

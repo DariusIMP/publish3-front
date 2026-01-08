@@ -1,6 +1,7 @@
 'use client';
 
 import { aptos } from 'src/lib/movement/client';
+
 import { MovementContext } from './movement-context';
 
 // ----------------------------------------------------------------------

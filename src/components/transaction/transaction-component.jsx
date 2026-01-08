@@ -3,18 +3,19 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
-import CircularProgress from '@mui/material/CircularProgress';
-import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
+
+import { formatOctasToMove, fetchTransactionDetails, calculateTransactionCost } from 'src/utils/transaction-utils';
 
 import { Iconify } from 'src/components/iconify';
-import { calculateTransactionCost, fetchTransactionDetails, formatOctasToMove } from 'src/utils/transaction-utils';
 
 // ----------------------------------------------------------------------
 
@@ -49,7 +50,7 @@ export default function TransactionComponent({
     try {
       const details = await fetchTransactionDetails(transaction_hash);
       setTransactionDetails(details);
-      
+
       const cost = calculateTransactionCost(details);
       setTransactionCost(cost);
     } catch (err) {
@@ -77,15 +78,9 @@ export default function TransactionComponent({
     });
   };
 
-  const formatMoveAmount = (amount) => {
-    if (!amount) return '0';
-    // Convert from octas to MOVE (1 MOVE = 100,000,000 octas)
-    const moveAmount = amount / 100000000;
-    return moveAmount.toFixed(2);
-  };
 
-  const getStatusColor = (status) => {
-    switch (status?.toUpperCase()) {
+  const getStatusColor = (statusParam) => {
+    switch (statusParam?.toUpperCase()) {
       case 'PAID':
       case 'PUBLISHED':
       case 'SETTLED':
@@ -100,13 +95,9 @@ export default function TransactionComponent({
     }
   };
 
-  const getTypeLabel = () => {
-    return type === 'purchase' ? 'Purchase' : 'Publication';
-  };
+  const getTypeLabel = () => type === 'purchase' ? 'Purchase' : 'Publication';
 
-  const getTypeIcon = () => {
-    return type === 'purchase' ? 'solar:cart-bold' : 'solar:document-text-bold';
-  };
+  const getTypeIcon = () => type === 'purchase' ? 'solar:cart-bold' : 'solar:document-text-bold';
 
   const getExplorerUrl = () => {
     if (!transaction_hash) return null;
@@ -117,12 +108,12 @@ export default function TransactionComponent({
     if (transactionCost) {
       return transactionCost.totalMove;
     }
-    
+
     // Fallback to publication price if available
     if (price) {
       return formatOctasToMove(price);
     }
-    
+
     return '0';
   };
 
@@ -143,7 +134,7 @@ export default function TransactionComponent({
                 variant="outlined"
               />
             </Stack>
-            
+
             <Typography variant="body2" color="text.secondary">
               {formatDate(created_at)}
             </Typography>

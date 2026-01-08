@@ -11,8 +11,6 @@ import { RouterLink } from 'src/routes/components';
 
 import { CONFIG } from 'src/global-config';
 
-import { Label } from 'src/components/label';
-
 import { useAuthContext } from 'src/auth/hooks'
 
 // ----------------------------------------------------------------------

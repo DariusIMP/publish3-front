@@ -2,26 +2,25 @@
 
 import { z as zod } from 'zod';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useCreateWallet } from '@privy-io/react-auth/extended-chains';
 import { useSearchParams } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 
-import { toast } from 'src/components/snackbar';
-
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
+import { toast } from 'src/components/snackbar';
+import { Form, Field } from 'src/components/hook-form';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
-import { Form, Field } from 'src/components/hook-form';
 import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -40,7 +39,6 @@ export default function AuthorRegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, updateAuthor } = useAuthContext();
-  const { createWallet, isLoading: isCreatingWallet } = useCreateWallet();
 
   const methods = useForm({
     mode: 'onSubmit',
@@ -76,17 +74,12 @@ export default function AuthorRegisterPage() {
 
       console.log('Author created successfully:', response.data);
 
-      // Update AuthContext with the newly created author
       updateAuthor(response.data);
-
       toast.success('Registered as an author successfully!');
-
-      // Determine where to redirect based on query param
       const returnTo = searchParams.get('returnTo');
       if (returnTo) {
         router.push(returnTo);
       } else {
-        // Default redirect to author details page
         router.push(paths.dashboard.authors.details.view);
       }
     } catch (error) {
@@ -169,10 +162,10 @@ export default function AuthorRegisterPage() {
               <Button
                 type="submit"
                 variant="contained"
-                loading={isSubmitting || isCreatingWallet}
-                disabled={isSubmitting || isCreatingWallet}
+                loading={isSubmitting}
+                disabled={isSubmitting}
               >
-                {isSubmitting || isCreatingWallet ? 'Creating Wallet & Registering...' : 'Register Author'}
+                {isSubmitting ? 'Creating Wallet & Registering...' : 'Register Author'}
               </Button>
             </Box>
           </Form>

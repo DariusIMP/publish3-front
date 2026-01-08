@@ -1,6 +1,7 @@
 'use client';
 
 import { z as zod } from 'zod';
+import dynamic from 'next/dynamic';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { useWallets } from '@privy-io/react-auth';
@@ -28,7 +29,18 @@ import { Form, Field } from 'src/components/hook-form';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import { TransactionCostDialog } from 'src/components/transaction/transaction-cost-dialog';
 
-import { SimplePdfView } from 'src/sections/pdf/view/simple-pdf-view';
+const SimplePdfView = dynamic(() => import('src/sections/pdf/view/simple-pdf-view'), {
+  ssr: false,
+  loading: () => (
+    <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <Box sx={{ typography: 'body1', color: 'text.secondary' }}>
+          Loading PDF viewer...
+        </Box>
+      </Box>
+    </Box>
+  ),
+});
 
 // ----------------------------------------------------------------------
 

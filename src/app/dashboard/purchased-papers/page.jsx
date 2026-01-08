@@ -1,37 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CircularProgress from '@mui/material/CircularProgress';
-import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
-import Snackbar from '@mui/material/Snackbar';
-import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-
-import { Iconify } from 'src/components/iconify';
-import { PurchaseCard } from 'src/components/purchase/purchase-card';
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
+import { Iconify } from 'src/components/iconify';
+import { PurchaseCard } from 'src/components/purchase/purchase-card';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 
 import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
 export default function PurchasedPapersPage() {
   const router = useRouter();
-  const { user, author } = useAuthContext();
+  const { user } = useAuthContext();
 
   const [loading, setLoading] = useState(true);
   const [purchases, setPurchases] = useState([]);
@@ -115,7 +114,7 @@ export default function PurchasedPapersPage() {
                 No Purchased Papers Yet
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                You haven't purchased any papers yet. Browse the publications to find papers to purchase.
+                You haven&apos;t purchased any papers yet. Browse the publications to find papers to purchase.
               </Typography>
               <Button
                 variant="contained"

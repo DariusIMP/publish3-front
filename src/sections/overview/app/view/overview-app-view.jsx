@@ -1,40 +1,37 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 
+import { paths } from 'src/routes/paths';
+import { RouterLink } from 'src/routes/components';
+
+import { CONFIG } from 'src/global-config';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { _appAuthors, _appRelated, _appInvoices, _appInstalled } from 'src/_mock';
-
-import { svgColorClasses } from 'src/components/svg-color';
-
+import { getUsersCount } from 'src/actions/users/action';
 import { useWalletContext } from 'src/context/wallet-context';
+import { getPurchasesCount } from 'src/actions/purchases/action';
+import { getTopAuthorsByPurchases } from 'src/actions/authors/action';
+import { getPublicationsList, getPublicationsCount } from 'src/actions/publications/action';
 
-import { AppWidget } from '../app-widget';
+import { ContractExplorerCard } from 'src/components/contract-explorer-card';
+import { WalletCurrentBalance } from 'src/components/wallet/wallet-current-balance';
+
 import { AppWelcome } from '../app-welcome';
 import { AppFeatured } from '../app-featured';
 import { AppTopAuthors } from '../app-top-authors';
 import { AppWidgetSummary } from '../app-widget-summary';
-import { WalletCurrentBalance } from 'src/components/wallet/wallet-current-balance';
-import { ContractExplorerCard } from 'src/components/contract-explorer-card';
-import { CONFIG } from 'src/global-config';
-import { RouterLink } from 'src/routes/components';
-import { paths } from 'src/routes/paths';
-import { getPublicationsList, getPublicationsCount } from 'src/actions/publications/action';
-import { getUsersCount } from 'src/actions/users/action';
-import { getPurchasesCount } from 'src/actions/purchases/action';
-import { getTopAuthorsByPurchases } from 'src/actions/authors/action';
 
 // ----------------------------------------------------------------------
 
 export function OverviewAppView() {
   const theme = useTheme();
   const [featuredPublications, setFeaturedPublications] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [usersCount, setUsersCount] = useState(0);
   const [publicationsCount, setPublicationsCount] = useState(0);
   const [purchasesCount, setPurchasesCount] = useState(0);
@@ -44,7 +41,7 @@ export function OverviewAppView() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [publications, usersCount, purchasesCount, publicationsCount, topAuthorsData] = await Promise.all([
+        const [publications, usersCountRes, purchasesCountRes, publicationsCountRes, topAuthorsData] = await Promise.all([
           getPublicationsList(),
           getUsersCount(),
           getPurchasesCount(),
@@ -59,9 +56,9 @@ export function OverviewAppView() {
           coverUrl: `${CONFIG.assetsDir}/assets/background/background-1.png`,
         }));
         setFeaturedPublications(featured);
-        setUsersCount(usersCount);
-        setPurchasesCount(purchasesCount);
-        setPublicationsCount(publicationsCount);
+        setUsersCount(usersCountRes);
+        setPurchasesCount(purchasesCountRes);
+        setPublicationsCount(publicationsCountRes);
         // Map top authors to expected format
         const mappedAuthors = topAuthorsData.map((author, index) => ({
           id: author.id || `author-${index}`,
@@ -72,8 +69,6 @@ export function OverviewAppView() {
         setTopAuthors(mappedAuthors);
       } catch (error) {
         console.error('Failed to fetch data for dashboard:', error);
-      } finally {
-        setLoading(false);
       }
     }
     fetchData();
@@ -164,8 +159,8 @@ export function OverviewAppView() {
         <Grid size={{ xs: 12, md: 4 }}>
           <ContractExplorerCard />
         </Grid>
-        
-        
+
+
       </Grid>
     </DashboardContent>
   );

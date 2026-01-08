@@ -3,12 +3,11 @@ import { useBoolean } from 'minimal-shared/hooks';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 
-import { formatMoveBalance } from 'src/lib/aptos';
-
 import { CONFIG } from 'src/global-config';
+import { formatMoveBalance } from 'src/lib/aptos';
+import { useWalletContext } from 'src/context/wallet-context';
 
 import { Iconify } from 'src/components/iconify';
-import { useWalletContext } from 'src/context/wallet-context';
 
 // ----------------------------------------------------------------------
 

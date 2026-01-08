@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 import { getAuthorsList } from 'src/actions/authors';
 import { DashboardContent } from 'src/layouts/dashboard';
+
 import { AuthorCardsView } from 'src/sections/authors/view/author-cards-view';
 
 // ----------------------------------------------------------------------

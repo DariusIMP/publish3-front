@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { PrivyProvider, usePrivy } from '@privy-io/react-auth';
-
-import axiosInstance, { endpoints } from 'src/lib/axios';
+import { usePrivy, PrivyProvider } from '@privy-io/react-auth';
 
 import { CONFIG } from 'src/global-config';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
 import { AuthContext } from '../auth-context';
 
 // ----------------------------------------------------------------------

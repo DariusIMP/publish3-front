@@ -16,8 +16,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import TableContainer from '@mui/material/TableContainer';
 
-import { octasToMove, formatMoveBalance } from 'src/lib/aptos';
 import { useWalletContext } from 'src/context/wallet-context';
+import { octasToMove, formatMoveBalance } from 'src/lib/aptos';
 
 // ----------------------------------------------------------------------
 

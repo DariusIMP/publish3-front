@@ -2,36 +2,35 @@
 
 import { useState, useEffect } from 'react';
 
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
-import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Snackbar from '@mui/material/Snackbar';
-import Stack from '@mui/material/Stack';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
-import { usePrivy } from '@privy-io/react-auth';
-
-import { getPublication } from 'src/actions/publications/action';
-
-import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
-import { Iconify } from 'src/components/iconify';
-import { Label } from 'src/components/label';
-import { DashboardContent } from 'src/layouts/dashboard';
 import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
 import { useRouter } from 'src/routes/hooks';
-
-import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
+import { RouterLink } from 'src/routes/components';
 
 import { fDate } from 'src/utils/format-time';
-import { PurchaseTransactionCostDialog } from 'src/components/transaction/purchase-transaction-cost-dialog';
-import { octasToMove, formatMoveBalance } from 'src/lib/aptos';
+
+import { DashboardContent } from 'src/layouts/dashboard';
+import axiosInstance, { endpoints } from 'src/lib/axios';
 import { useWalletContext } from 'src/context/wallet-context';
+import { octasToMove, formatMoveBalance } from 'src/lib/aptos';
+import { getPublication } from 'src/actions/publications/action';
+
+import { Label } from 'src/components/label';
+import { Iconify } from 'src/components/iconify';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { PurchaseTransactionCostDialog } from 'src/components/transaction/purchase-transaction-cost-dialog';
+
+import { useAuthContext } from 'src/auth/hooks';
 
 // ----------------------------------------------------------------------
 
@@ -42,8 +41,6 @@ export function PublicationPreviewView({ id }) {
   const [publication, setPublication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [purchaseError, setPurchaseError] = useState(null);
-  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [hasAccess, setHasAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
@@ -133,13 +130,10 @@ export function PublicationPreviewView({ id }) {
   const handleConfirmPurchase = async () => {
     setCostDialogOpen(false);
     setPurchasing(true);
-    setPurchaseError(null);
-    setPurchaseSuccess(false);
 
     try {
-      const response = await axiosInstance.post(endpoints.publications.purchase(id));
+      await axiosInstance.post(endpoints.publications.purchase(id));
 
-      setPurchaseSuccess(true);
       setSnackbar({
         open: true,
         message: 'Publication purchased successfully! You can now access the full paper.',
@@ -160,7 +154,6 @@ export function PublicationPreviewView({ id }) {
         errorMessage = error.message;
       }
 
-      setPurchaseError(errorMessage);
       setSnackbar({
         open: true,
         message: errorMessage,

@@ -3,26 +3,27 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
-import CircularProgress from '@mui/material/CircularProgress';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CardContent from '@mui/material/CardContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { Iconify } from 'src/components/iconify';
-import { Label } from 'src/components/label';
+import { fetchTransactionDetails, calculateTransactionCost } from 'src/utils/transaction-utils';
 
 import axiosInstance, { endpoints } from 'src/lib/axios';
-import { calculateTransactionCost, fetchTransactionDetails, formatOctasToMove } from 'src/utils/transaction-utils';
+
+import { Label } from 'src/components/label';
+import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -141,19 +142,6 @@ export function PurchaseCard({ purchase, onViewPublication, onReadPublication })
     if (authors.length === 1) return authors[0].name || 'Unknown author';
     if (authors.length === 2) return `${authors[0].name} and ${authors[1].name}`;
     return `${authors[0].name} et al.`;
-  };
-
-  const getTotalCost = () => {
-    if (transactionCost) {
-      return transactionCost.totalMove;
-    }
-
-    // Fallback to publication price if available
-    if (publication?.price) {
-      return formatOctasToMove(publication.price);
-    }
-
-    return '0';
   };
 
   const getExplorerUrl = () => {

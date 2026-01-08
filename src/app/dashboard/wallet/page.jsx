@@ -3,25 +3,26 @@
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Container from '@mui/material/Container';
+import Tab from '@mui/material/Tab';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+import Tabs from '@mui/material/Tabs';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import axiosInstance, { endpoints } from 'src/lib/axios';
+
 import WalletComponent from 'src/components/wallet/wallet-component';
+import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
 import TransactionComponent from 'src/components/transaction/transaction-component';
 
 import { useAuthContext } from 'src/auth/hooks';
-import axiosInstance, { endpoints } from 'src/lib/axios';
 
 // ----------------------------------------------------------------------
 
@@ -157,7 +158,7 @@ export default function WalletPage() {
               walletAddress={walletAddress}
               collectedMoney={userData?.collected_money || 0}
               registrationDate={userData?.created_at || author?.created_at}
-              showFundButton={true}
+              showFundButton
             />
           </Grid>
 
