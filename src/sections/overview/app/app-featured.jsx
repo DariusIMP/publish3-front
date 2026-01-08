@@ -5,6 +5,9 @@ import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 
+import { paths } from 'src/routes/paths';
+import { RouterLink } from 'src/routes/components';
+
 import { Image } from 'src/components/image';
 import {
   Carousel,
@@ -83,7 +86,14 @@ function CarouselItem({ item, sx, ...other }) {
           Featured Documents
         </Typography>
 
-        <Link color="inherit" underline="none" variant="h5" noWrap>
+        <Link
+          component={RouterLink}
+          href={paths.dashboard.publications.details(item.id)}
+          color="inherit"
+          underline="none"
+          variant="h5"
+          noWrap
+        >
           {item.title}
         </Link>
 
