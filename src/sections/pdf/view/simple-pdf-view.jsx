@@ -16,7 +16,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-export function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale = 1 }) {
+export default function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale = 1 }) {
   const [numPages, setNumPages] = useState(0);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [error, setError] = useState(null);
