@@ -29,7 +29,7 @@ export const metadata = {
   icons: [
     {
       rel: 'icon',
-      url: `${CONFIG.assetsDir}/logo/publish3-logo-single.png`,
+      url: `${CONFIG.assetsDir}/logo/publish3-single.svg`,
     },
   ],
 };
