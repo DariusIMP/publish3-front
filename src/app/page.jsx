@@ -1,9 +1,7 @@
-'use client';
-
-import { HomeView } from 'src/sections/home/view/home-view';
+import { redirect } from 'next/navigation';
 
 // ----------------------------------------------------------------------
 
 export default function Page() {
-  return <HomeView />;
+  redirect('/dashboard');
 }
