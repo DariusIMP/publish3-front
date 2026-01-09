@@ -47,7 +47,7 @@ export function PublicationPreviewView({ id }) {
   const [costDialogOpen, setCostDialogOpen] = useState(false);
   const [simulationResult, setSimulationResult] = useState(null);
   const [simulating, setSimulating] = useState(false);
-  const { moveBalance } = useWalletContext();
+  const { moveBalance, loadBalance } = useWalletContext();
   const publicationPriceMove = publication ? octasToMove(publication.price) : 0;
   const insufficientFunds = moveBalance !== null && moveBalance < publicationPriceMove;
 
@@ -139,6 +139,14 @@ export function PublicationPreviewView({ id }) {
         message: 'Publication purchased successfully! You can now access the full paper.',
         severity: 'success',
       });
+
+      // Immediately update local state to show user has access
+      setHasAccess(true);
+      
+      // Refresh wallet balance after successful purchase
+      if (loadBalance) {
+        await loadBalance();
+      }
 
       setTimeout(() => {
         router.push(paths.dashboard.publications.read(id));

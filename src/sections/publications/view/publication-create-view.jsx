@@ -22,6 +22,7 @@ import { fetchMoveBalance } from 'src/lib/aptos';
 import { getAuthorsList } from 'src/actions/authors';
 import axiosInstance, { endpoints } from 'src/lib/axios';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { useWalletContext } from 'src/context/wallet-context';
 import { getPublicationsList } from 'src/actions/publications/action';
 
 import { toast } from 'src/components/snackbar';
@@ -159,6 +160,7 @@ export function PublicationCreateView() {
   const router = useRouter();
   const { wallets } = useWallets();
   const walletAddress = wallets?.[0]?.address;
+  const { loadBalance } = useWalletContext();
   const fileIsLoaded = useBoolean(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [tags, setTags] = useState([]);
@@ -341,6 +343,12 @@ export function PublicationCreateView() {
       console.info('Publication created successfully:', createResponse.data);
       const publicationId = createResponse.data.id;
       toast.success('Publication submitted successfully!');
+      
+      // Refresh wallet balance after successful publication creation
+      if (loadBalance) {
+        await loadBalance();
+      }
+      
       router.push(paths.dashboard.publications.read(publicationId));
     } catch (error) {
       console.error('Failed to create publication:', error);

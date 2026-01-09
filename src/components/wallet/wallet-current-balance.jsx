@@ -46,7 +46,7 @@ export function WalletCurrentBalance({ balance, sx, ...other }) {
 
         <Box sx={{ gap: 1, display: 'flex', alignItems: 'center' }}>
           <Box component="span" sx={{ typography: 'h4' }}>
-            {showCurrency.value ? '********' : formatMoveBalance(balance, 2)}
+            {showCurrency.value ? '********' : formatMoveBalance(balance, 8)}
           </Box>
 
           <IconButton color="inherit" onClick={showCurrency.onToggle} sx={{ opacity: 0.48 }}>
