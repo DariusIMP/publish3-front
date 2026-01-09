@@ -8,6 +8,7 @@ import { Page, pdfjs, Document } from 'react-pdf';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
+import { useResizeDetector } from 'react-resize-detector';
 
 // ----------------------------------------------------------------------
 
@@ -17,6 +18,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 export default function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale = 1 }) {
+  const { ref, width } = useResizeDetector();
+
   const [numPages, setNumPages] = useState(0);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [error, setError] = useState(null);
@@ -77,7 +80,7 @@ export default function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale =
 
   return (
     <Box sx={{ height: '100%', overflow: 'auto' }}>
-      <Card sx={{ p: 2 }}>
+      <Card ref={ref} sx={{ p: 2, width: '100%' }}>
         <Document
           file={pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
@@ -87,7 +90,7 @@ export default function SimplePdfView({ pdfFile, pdfUrl: externalPdfUrl, scale =
           {[...Array(numPages)].map((_, index) => (
             <Box key={`page_${index + 1}`} sx={{ mb: 2 }}>
               <Page
-                scale={scale}
+                width={width}
                 pageNumber={index + 1}
                 renderAnnotationLayer={false}
                 renderForms={false}
