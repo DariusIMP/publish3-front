@@ -16,9 +16,9 @@ export function AuthSplitSection({
   method,
   methods,
   layoutQuery = 'md',
-  title = 'Welcome back',
+  title = '',
   imgUrl = `${CONFIG.assetsDir}/assets/illustrations/illustration-dashboard.png`,
-  subtitle = 'Publish content you truly own. Permanent, verifiable, and independent.',
+  subtitle = '',
   ...other
 }) {
   return (
