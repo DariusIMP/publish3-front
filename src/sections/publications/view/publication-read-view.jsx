@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
@@ -222,17 +223,18 @@ export function PublicationReadView() {
         sx={{ mb: { xs: 3, md: 5 } }}
       />
 
-      <Box sx={{ display: 'flex', height: 'calc(100vh - 100px)', gap: 2 }}>
+      <Grid container spacing={3} sx={{ height: { xs: 'auto', md: 'calc(100vh - 100px)' } }}>
         {/* Left side: Publication metadata */}
-        <Box
-          sx={{
-            flex: 1,
-            overflow: 'auto',
-            borderRight: '1px solid',
-            borderColor: 'divider',
-            padding: 3,
-          }}
-        >
+        <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+          <Box
+            sx={{
+              height: '100%',
+              overflow: 'auto',
+              borderRight: { xs: 'none', md: '1px solid' },
+              borderColor: 'divider',
+              padding: { xs: 2, md: 3 },
+            }}
+          >
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h4" gutterBottom>
@@ -376,9 +378,11 @@ export function PublicationReadView() {
             </CardContent>
           </Card>
         </Box>
+        </Grid>
 
         {/* Right side: PDF viewer */}
-        <Box sx={{ flex: 2, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <Grid size={{ xs: 12, md: 8, lg: 8 }}>
+          <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
           <Box
             sx={{
               p: 2,
@@ -396,25 +400,6 @@ export function PublicationReadView() {
                 {isAuthor ? 'Author access' : hasPurchased ? 'Full access granted' : 'Purchase required'}
               </Typography>
             </Box>
-            {(isAuthor || hasPurchased) && (
-              <Stack direction="row" spacing={1}>
-                <Tooltip title="Zoom in">
-                  <IconButton size="small">
-                    <Iconify icon="solar:zoom-in-bold" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Zoom out">
-                  <IconButton size="small">
-                    <Iconify icon="solar:zoom-out-bold" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Full screen">
-                  <IconButton size="small">
-                    <Iconify icon="solar:fullscreen-bold" />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            )}
           </Box>
 
           <Box sx={{ flex: 1, overflow: 'auto', p: 2, backgroundColor: 'grey.100' }}>
@@ -512,7 +497,8 @@ export function PublicationReadView() {
             )}
           </Box>
         </Box>
-      </Box>
+        </Grid>
+      </Grid>
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

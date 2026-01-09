@@ -5,10 +5,10 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 import { useState, useEffect } from 'react';
 import { Page, pdfjs, Document } from 'react-pdf';
+import { useResizeDetector } from 'react-resize-detector';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import { useResizeDetector } from 'react-resize-detector';
 
 // ----------------------------------------------------------------------
 
