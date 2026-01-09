@@ -133,7 +133,7 @@ export default function PurchasedPapersPage() {
               </Typography>
             </Box>
 
-            <Grid container spacing={3}>
+            <Stack container spacing={3}>
               {purchases.map((purchase) => (
                 <Grid item xs={12} key={purchase.id}>
                   <PurchaseCard
@@ -143,7 +143,7 @@ export default function PurchasedPapersPage() {
                   />
                 </Grid>
               ))}
-            </Grid>
+            </Stack>
 
             {/* Pagination */}
             {totalCount > limit && (

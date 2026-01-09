@@ -19,6 +19,7 @@ import axiosInstance, { endpoints } from 'src/lib/axios';
 
 import { Iconify } from 'src/components/iconify';
 import { CustomBreadcrumbs } from 'src/components/custom-breadcrumbs';
+import { Stack } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -198,23 +199,57 @@ export default function AuthorViewPage() {
                 Showing {publications.length} publication{publications.length !== 1 ? 's' : ''}
               </Typography>
 
-              <Grid container spacing={2}>
+              <Stack container spacing={2}>
                 {publications.map((publication) => (
-                  <Grid item xs={12} key={publication.id}>
-                    <Card variant="outlined" sx={{ p: 2 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+                  <Grid key={publication.id}>
+                    <Card 
+                      variant="outlined" 
+                      sx={{ 
+                        width: '100%',
+                        flexDirection: 'column',
+                        p: 2.5,
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          boxShadow: 4,
+                          borderColor: 'primary.main',
+                        }
+                      }}
+                    >
+                      <Typography 
+                        variant="subtitle1" 
+                        sx={{ 
+                          fontWeight: 'medium',
+                          mb: 1,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
                         {publication.title}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                        {publication.about?.substring(0, 150)}...
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary" 
+                        sx={{ 
+                          mb: 2,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {publication.about || 'No description available'}
                       </Typography>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="caption" color="text.secondary">
                           Published: {new Date(publication.created_at).toLocaleDateString()}
                         </Typography>
                         <Button
                           size="small"
-                          variant="text"
+                          variant="outlined"
                           onClick={() => router.push(paths.dashboard.publications.details(publication.id))}
                         >
                           View Details
@@ -223,7 +258,7 @@ export default function AuthorViewPage() {
                     </Card>
                   </Grid>
                 ))}
-              </Grid>
+              </Stack>
             </Box>
           )}
         </Card>
